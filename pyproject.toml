@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "uchina_guchi_dict"
+version = "0.1.0"
+description = ""
+authors = ["Hisanobu Nkamaura"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+openpyxl = "^3.0.10"
+ipython = "^8.4.0"
+jedi = "^0.18.1"
+yapf = "^0.32.0"
+mypy = "^0.971"
+flake8 = "^5.0.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
