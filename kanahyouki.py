@@ -33,24 +33,15 @@ def _get_mora(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
     return m, ch_list_
 
 
-def get_mora(ch_list: List[str]) -> Tuple[str, str]:
-    pass
-
 def split_into_moras(word:str) -> List[str]:
     word = delete_others(word)
     chr_list = list(word)
     moras : List[str] = []
-    is_inside_mora = True
-    current_mora = []
-    while (len(word)):
-        ch = chr_list.pop()
-        if ch in glottal_stops:
-            current_mora.append(ch)
-            pass
-        
+    while (len(chr_list)):
+        m, chr_list = _get_mora('', chr_list)
+        moras.append(m)
             
-            
-    return []
+    return moras
 
 def convert2kana(pronunciation: str) -> str:
     pass
