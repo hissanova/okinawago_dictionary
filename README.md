@@ -6,7 +6,7 @@ https://mmsrv.ninjal.ac.jp/okinawago/
 
 # 加えた修正
 
-- okinawa_01.xlsx
-  - 修正後のファイル: ./data/base_lists/okinawa_01.tsv
+- ./resources/okinawa_01.xlsx
+  - 修正後のファイル: ./resources/base_lists/okinawa_01.tsv
   - 見出し語の文字列に全角文字があったのを半角文字に修正した。
   - '●'の文字は紙の辞書から読み取りに失敗した文字列と思われ、実物の辞書を見て直接編集した。（見出し語、意味）

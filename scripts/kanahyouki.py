@@ -8,6 +8,15 @@ hatsuon = {'N'}
 glottal_stops = { "'", '?'}
 others ={' ', '(', ')', ',', '-', '=', ']'}
 
+"""
+日本語（沖縄語）の音節（モーラ？）のスキーム
+[g]([P]|[C][v]V[V])
+- g:glottal stop ["'", "?"]
+- P:pseudo-consonant ["Q", "N"]
+- C:consonant
+- v:semi-vowel
+- V:vowel
+"""
 
 def delete_others(word: str) -> str:
     for other_chr in others:
