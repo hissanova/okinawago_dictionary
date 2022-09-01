@@ -5,11 +5,11 @@ from kanahyouki import (
     semi_vowels,
     hatsuon,
     sokuon,
-    check_glottal_stop,
-    check_consonant,
-    check_semi_vowels,
-    check_vowel,
-    check_ending)
+    _check_glottal_stop,
+    _check_consonant,
+    _check_semi_vowels,
+    _check_vowel,
+    _check_ending)
 
 
 import pytest
@@ -17,48 +17,48 @@ import pytest
 def test_check_ending_non_vowels():
     non_vowels = consonants.union(semi_vowels).union(hatsuon).union(sokuon)
     for item in non_vowels:
-        assert ('a', [item]) == check_ending('a', [item])
+        assert ('a', [item]) == _check_ending('a', [item])
     
 
 def test_check_ending_vowels():
     for item in vowels.difference({'a'}):
-        assert ('a', [item]) == check_ending('a', [item])
+        assert ('a', [item]) == _check_ending('a', [item])
 
-    assert ('aa', ['N']) == check_ending('a', list('aN'))
-    assert ('aa', []) == check_ending('a', list('a'))
+    assert ('aa', ['N']) == _check_ending('a', list('aN'))
+    assert ('aa', []) == _check_ending('a', list('a'))
 
 
 def test_check_vowel_exception():
     with pytest.raises(Exception):
-        check_vowel('',['k'])
+        _check_vowel('',['k'])
 
 def test_check_vowel_single_vowel():
-    assert ('a', []) == check_vowel('',['a'])
+    assert ('a', []) == _check_vowel('',['a'])
 
 
 def test_check_vowel_long_vowel():
-    assert ('aa', []) == check_vowel('',list('aa'))
+    assert ('aa', []) == _check_vowel('',list('aa'))
     
 def test_check_vowel_different_vowels():
-    assert ('a', ['e']) == check_vowel('',list('ae'))
+    assert ('a', ['e']) == _check_vowel('',list('ae'))
 
 
 def test_check_semi_vowels():
-    assert ('ja', []) == check_semi_vowels('', list("ja"))
-    assert ('wa', []) == check_semi_vowels('', list("wa"))
-    assert ('a', []) == check_semi_vowels('', list("a"))
+    assert ('ja', []) == _check_semi_vowels('', list("ja"))
+    assert ('wa', []) == _check_semi_vowels('', list("wa"))
+    assert ('a', []) == _check_semi_vowels('', list("a"))
 
 def test_check_consonant():
-    assert ('hwa', ['N']) == check_consonant('', list('hwaN'))
-    assert ('ca', []) == check_consonant('', list('ca'))
-    assert ('kja', []) == check_consonant('', list('kja'))
-    assert ('kaa', []) == check_consonant('', list('kaa'))
-    assert ('kjaa', []) == check_consonant('', list('kjaa'))
-    assert ('kjaa', ['N']) == check_consonant('', list('kjaaN'))
+    assert ('hwa', ['N']) == _check_consonant('', list('hwaN'))
+    assert ('ca', []) == _check_consonant('', list('ca'))
+    assert ('kja', []) == _check_consonant('', list('kja'))
+    assert ('kaa', []) == _check_consonant('', list('kaa'))
+    assert ('kjaa', []) == _check_consonant('', list('kjaa'))
+    assert ('kjaa', ['N']) == _check_consonant('', list('kjaaN'))
 
 
 def test_check_glottal_stop():
-    assert ('?a', []) == check_glottal_stop(list('?a'))
-    assert ("'e", []) == check_glottal_stop(list("'e"))
-    assert ("?jaa", []) == check_glottal_stop(list("?jaa"))
-    assert ("?jaa", ["N"]) == check_glottal_stop(list("?jaaN"))
+    assert ('?a', []) == _check_glottal_stop(list('?a'))
+    assert ("'e", []) == _check_glottal_stop(list("'e"))
+    assert ("?jaa", []) == _check_glottal_stop(list("?jaa"))
+    assert ("?jaa", ["N"]) == _check_glottal_stop(list("?jaaN"))

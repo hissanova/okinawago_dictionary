@@ -14,7 +14,7 @@ exceptions = ["hNN"] # 発音記号の例外
 """
 日本語（沖縄語）の音節（モーラ？）のスキーム
 mora::=[g]([P]|[C][v]V[V])
-word::=mora
+word::=mora+...
 - g:glottal stop ["'", "?"]
 - P:pseudo-consonant ["Q", "N"]
 - C:consonant
@@ -22,38 +22,48 @@ word::=mora
 - V:vowel
 """
 
-def check_glottal_stop(ch_list: List[str]) -> Tuple[str, List[str]]:
+
+def delete_others(word: str) -> str:
+    for other_chr in others:
+        word = word.replace(other_chr, '')
+    return word
+
+
+def _check_glottal_stop(ch_list: List[str]) -> Tuple[str, List[str]]:
     ch = ch_list[0]
     if ch in glottal_stops:
-        return check_consonant(ch, ch_list[1:])
+        return _check_consonant(ch, ch_list[1:])
     else:
-        return check_consonant('', ch_list)
+        return _check_consonant('', ch_list)
 
 
-def check_consonant(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
+def _check_consonant(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
     ch = ch_list[0]
     if ch in sokuon.union(hatsuon):
         return ch, ch_list[1:]
     elif ch in consonants:
-        return check_semi_vowels(mora + ch, ch_list[1:])
+        return _check_semi_vowels(mora + ch, ch_list[1:])
     else:
-        return check_semi_vowels(mora, ch_list)
+        return _check_semi_vowels(mora, ch_list)
 
-def check_semi_vowels(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
+
+def _check_semi_vowels(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
     ch = ch_list[0]
     if ch in semi_vowels:
-        return check_vowel(mora + ch, ch_list[1:])
+        return _check_vowel(mora + ch, ch_list[1:])
     else:
-        return check_vowel(mora, ch_list)
+        return _check_vowel(mora, ch_list)
     
-def check_vowel(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
+
+def _check_vowel(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
     ch = ch_list[0]
     if ch in vowels:
-        return check_ending(mora + ch, ch_list[1:])
+        return _check_ending(mora + ch, ch_list[1:])
     else:
         raise Exception(f"{mora}の次は、母音{{aeiou}}が続きます。")
 
-def check_ending(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
+
+def _check_ending(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
     if len(ch_list) == 0:
         return mora, ch_list
     ch = ch_list[0]
@@ -63,17 +73,6 @@ def check_ending(mora:str, ch_list: List[str]) -> Tuple[str, List[str]]:
         return mora, ch_list
 
 
-def _get_mora2(ch_list: List[str]) -> Tuple[str, List[str]]:
-    return check_glottal_stop(ch_list)
-
-
-def delete_others(word: str) -> str:
-    for other_chr in others:
-        word = word.replace(other_chr, '')
-    return word
-
-
-
 def split_into_moras(word:str) -> List[str]:
     if word in exceptions:
         return [word]
@@ -81,7 +80,7 @@ def split_into_moras(word:str) -> List[str]:
     chr_list = list(word)
     moras : List[str] = []
     while (len(chr_list)):
-        m, chr_list = _get_mora2(chr_list)
+        m, chr_list = _check_glottal_stop(chr_list)
         moras.append(m)
             
     return moras
