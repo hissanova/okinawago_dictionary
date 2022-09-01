@@ -2,13 +2,14 @@ from typing import List, Tuple
 
 
 vowels = {'a', 'i', 'u', 'e', 'o'}
-conconants = {'C', 'S', 'Z', 'b', 'c', 'd', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'w', 'z'}
 consonants = {'C', 'S', 'Z', 'b', 'c', 'd', 'g', 'h', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'z'}
 semi_vowels = {'j', 'w'}
 sokuon = {'Q'}
 hatsuon = {'N'}
 glottal_stops = { "'", '?'}
 others ={' ', '(', ')', ',', '-', '=', ']'}
+
+exceptions = ["hNN"] # 発音記号の例外
 
 """
 日本語（沖縄語）の音節（モーラ？）のスキーム
@@ -71,7 +72,7 @@ def delete_others(word: str) -> str:
         word = word.replace(other_chr, '')
     return word
 
-exceptions = ["hNN"]
+
 
 def split_into_moras(word:str) -> List[str]:
     if word in exceptions:
