@@ -29,8 +29,8 @@ exceptions = ["hNN"]  # 発音記号の例外
 def _delete_others(pronunciation: str) -> str:
     """発音記号の文字列から、子音、半母音、母音以外の文字を消去します。"""
     for other_chr in others:
-        word = pronunciation.replace(other_chr, '')
-    return word
+        pronunciation = str(pronunciation).replace(other_chr, '')
+    return pronunciation
 
 
 def _check_glottal_stop(ch_list: List[str]) -> Tuple[str, List[str]]:
@@ -74,8 +74,6 @@ def _check_ending(mora: str, ch_list: List[str]) -> Tuple[str, List[str]]:
 
 def split_into_moras(pronunciation: str) -> List[str]:
     """発音記号の文字列をモーラに分解します。"""
-    if pronunciation in exceptions:
-        return [pronunciation]
     word = _delete_others(pronunciation)
     chr_list = list(word)
     moras: List[str] = []
@@ -89,6 +87,18 @@ def convert2kana(pronunciation: str) -> List[str]:
     """発音記号をかな表記に変換します。"""
     with open("resources/kana-table.json", 'r') as kana_list_file:
         pronunc_kana_dict = json.load(kana_list_file)
+
+    long_vowel_dict = {}
+    for pronunc, kana_list in pronunc_kana_dict.items():
+        if any(pronunc.endswith(vowel) for vowel in vowels):
+            pronunc += pronunc[-1]
+            kana_list = [kana + "ー" for kana in kana_list]
+        long_vowel_dict[pronunc] = kana_list
+
+    pronunc_kana_dict.update(long_vowel_dict)
+    if pronunciation in exceptions:
+        return ["フンー"]
+
     kana_list = []
     for mora in split_into_moras(pronunciation):
         kana_list.append(pronunc_kana_dict[mora])
