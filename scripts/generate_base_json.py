@@ -8,6 +8,7 @@ def convert(tsv_row):
     res = {}
     res["page-in-dict"] = tsv_row["辞書\nページ"]
     pronuc = tsv_row["見出し語"]
+    res["pronunciation"] = pronuc
     res["index"] = convert2kana(pronuc)
     res["accent"] = tsv_row["アクセント型"]
     res["pos"] = tsv_row["品詞"]
@@ -30,7 +31,7 @@ def main():
             new_entry.update(convert(entry))
             entry_list.append(new_entry)
     with open("./resources/base_lists/okinawa_01.json", 'w') as base_json:
-        json.dump(entry_list, base_json)
+        json.dump(entry_list, base_json, ensure_ascii=False)
 
 
 if __name__ == "__main__":
