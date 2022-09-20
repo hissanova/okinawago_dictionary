@@ -31,7 +31,7 @@ class Yamato2OkiConverter():
     def convert(tsv_row):
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
-        res["index"] = tsv_row["見出し"]
+        res["index"] = [tsv_row["見出し"]]
         res["kanji"] = tsv_row["見出しの漢字"]
         res["explanation"] = tsv_row["見出しの説明"]
         res["meaning"] = tsv_row["内容"]
