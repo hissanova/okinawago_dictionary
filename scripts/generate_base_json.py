@@ -35,8 +35,19 @@ class Yamato2OkiConverter():
         res["index"] = [to_hiragana(tsv_row["見出し"])]
         res["kanji"] = tsv_row["見出しの漢字"]
         res["explanation"] = tsv_row["見出しの説明"]
-        res["meaning"] = tsv_row["内容"]
+        res["translations"] = _parse_contents(tsv_row["内容"])
         return res
+
+
+def _parse_contents(content_obj):
+    contents_dict = {}
+    translations = content_obj.split('/')
+    contents_dict["main"] = translations.pop(0).split('，')
+    for related_str in translations[1:]:
+        # related_trans = {}
+        related_str = related_str.strip(' ')
+        contents_dict["related"] = related_str
+    return contents_dict
 
 
 def parse_args():
