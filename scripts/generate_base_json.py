@@ -1,7 +1,8 @@
 import argparse
 import json
 from csv import DictReader
-from pathlib import Path
+
+from wanakana import to_hiragana
 
 from kanahyouki import convert2kana
 
@@ -31,7 +32,7 @@ class Yamato2OkiConverter():
     def convert(tsv_row):
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
-        res["index"] = [tsv_row["見出し"]]
+        res["index"] = [to_hiragana(tsv_row["見出し"])]
         res["kanji"] = tsv_row["見出しの漢字"]
         res["explanation"] = tsv_row["見出しの説明"]
         res["meaning"] = tsv_row["内容"]
@@ -40,9 +41,12 @@ class Yamato2OkiConverter():
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('dict_type',
-                        choices=['o2y', 'y2o'],
-                        help="o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\ny2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)")
+    parser.add_argument(
+        'dict_type',
+        choices=['o2y', 'y2o'],
+        help=
+        "o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\ny2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)"
+    )
     return parser.parse_args()
 
 
