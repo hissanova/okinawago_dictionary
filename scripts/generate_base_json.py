@@ -2,6 +2,7 @@ import argparse
 import json
 from typing import List
 from csv import DictReader
+from enum import Enum
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
@@ -53,29 +54,54 @@ def _parse_contents(content_obj):
     return contents_dict
 
 
+class LangMode(Enum):
+    JAP = "japanese"
+    ENG = "english"
+    COMMA = "comma"
+    PARETH = "parenthesis"
+    OTHERS = "others"
+
+
+def _get_lang_mode(ch: str) -> LangMode:
+    if ch == '(':
+        return LangMode.PARETH
+    elif ch == '，':
+        return LangMode.COMMA
+    elif is_japanese(ch) or is_char_en_num(ch):
+        return LangMode.JAP
+    elif is_romaji(ch):
+        return LangMode.ENG
+    else:
+        return LangMode.OTHERS
+
+
 def _split_related_words_str(related_words: str) -> List[str]:
     split_word = []
-    is_jap = True
+    current_mode = LangMode.JAP
     current_chunk = ""
     while related_words:
         st = related_words[0]
-        if st == "(":
+        lang_mode = _get_lang_mode(st)
+        if lang_mode == LangMode.PARETH:
             closing_pos = related_words.index(")") + 1
             current_chunk += related_words[:closing_pos]
             related_words = related_words[closing_pos:]
             continue
-        if st == "，":
-            if is_jap:
+        if lang_mode == LangMode.COMMA:
+            if current_mode == LangMode.JAP:
                 current_chunk += st
             else:
                 if current_chunk:
                     split_word.append(current_chunk)
                 current_chunk = ''
-        elif is_japanese(st) or is_char_en_num(st):
-            if is_jap:
+        elif lang_mode == LangMode.OTHERS:
+            if current_chunk:
+                split_word.append(current_chunk)
+            current_chunk = st
+        else:
+            if current_mode == lang_mode:
                 current_chunk += st
             else:
-                is_jap = True
                 if current_chunk:
                     if current_chunk != "→":
                         split_word.append(current_chunk)
@@ -84,21 +110,7 @@ def _split_related_words_str(related_words: str) -> List[str]:
                         current_chunk += st
                 else:
                     current_chunk = st
-        elif is_romaji(st):
-            if is_jap:
-                is_jap = False
-                if current_chunk:
-                    if current_chunk != "→":
-                        split_word.append(current_chunk)
-                        current_chunk = st
-                    else:
-                        current_chunk += st
-            else:
-                current_chunk += st
-        else:
-            if current_chunk:
-                split_word.append(current_chunk)
-            current_chunk = st
+                current_mode = lang_mode
         related_words = related_words[1:]
     split_word.append(current_chunk)
     return split_word
