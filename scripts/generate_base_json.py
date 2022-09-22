@@ -1,8 +1,9 @@
 import argparse
 import json
+from typing import List
 from csv import DictReader
 
-from wanakana import to_hiragana
+from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
 from kanahyouki import convert2kana
 
@@ -42,12 +43,65 @@ class Yamato2OkiConverter():
 def _parse_contents(content_obj):
     contents_dict = {}
     translations = content_obj.split('/')
-    contents_dict["main"] = translations.pop(0).split('，')
-    for related_str in translations[1:]:
-        # related_trans = {}
-        related_str = related_str.strip(' ')
-        contents_dict["related"] = related_str
+    print(translations)
+    contents_dict["base"] = translations.pop(0).split('，')
+    contents_dict["related"] = []
+    for related_str in translations:
+        related_str = related_str.replace(' ', '')
+        contents_dict["related"].append(_split_related_words_str(related_str))
+    print(contents_dict)
     return contents_dict
+
+
+def _split_related_words_str(related_words: str) -> List[str]:
+    split_word = []
+    is_jap = True
+    current_chunk = ""
+    while related_words:
+        st = related_words[0]
+        if st == "(":
+            closing_pos = related_words.index(")") + 1
+            current_chunk += related_words[:closing_pos]
+            related_words = related_words[closing_pos:]
+            continue
+        if st == "，":
+            if is_jap:
+                current_chunk += st
+            else:
+                if current_chunk:
+                    split_word.append(current_chunk)
+                current_chunk = ''
+        elif is_japanese(st) or is_char_en_num(st):
+            if is_jap:
+                current_chunk += st
+            else:
+                is_jap = True
+                if current_chunk:
+                    if current_chunk != "→":
+                        split_word.append(current_chunk)
+                        current_chunk = st
+                    else:
+                        current_chunk += st
+                else:
+                    current_chunk = st
+        elif is_romaji(st):
+            if is_jap:
+                is_jap = False
+                if current_chunk:
+                    if current_chunk != "→":
+                        split_word.append(current_chunk)
+                        current_chunk = st
+                    else:
+                        current_chunk += st
+            else:
+                current_chunk += st
+        else:
+            if current_chunk:
+                split_word.append(current_chunk)
+            current_chunk = st
+        related_words = related_words[1:]
+    split_word.append(current_chunk)
+    return split_word
 
 
 def parse_args():
