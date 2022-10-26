@@ -80,37 +80,37 @@ def _split_related_words_str(related_words: str) -> List[str]:
     current_mode = LangMode.JAP
     current_chunk = ""
     while related_words:
-        st = related_words[0]
-        lang_mode = _get_lang_mode(st)
-        if lang_mode == LangMode.PARETH:
+        ch = related_words[0]
+        char_mode = _get_lang_mode(ch)
+        if char_mode == LangMode.PARETH:
             closing_pos = related_words.index(")") + 1
             current_chunk += related_words[:closing_pos]
             related_words = related_words[closing_pos:]
             continue
-        if lang_mode == LangMode.COMMA:
+        if char_mode == LangMode.COMMA:
             if current_mode == LangMode.JAP:
-                current_chunk += st
+                current_chunk += ch
             else:
                 if current_chunk:
                     split_word.append(current_chunk)
                 current_chunk = ''
-        elif lang_mode == LangMode.OTHERS:
+        elif char_mode == LangMode.OTHERS:
             if current_chunk:
                 split_word.append(current_chunk)
-            current_chunk = st
+            current_chunk = ch
         else:
-            if current_mode == lang_mode:
-                current_chunk += st
+            if current_mode == char_mode:
+                current_chunk += ch
             else:
                 if current_chunk:
                     if current_chunk != "→":
                         split_word.append(current_chunk)
-                        current_chunk = st
+                        current_chunk = ch
                     else:
-                        current_chunk += st
+                        current_chunk += ch
                 else:
-                    current_chunk = st
-                current_mode = lang_mode
+                    current_chunk = ch
+                current_mode = char_mode
         related_words = related_words[1:]
     split_word.append(current_chunk)
     return split_word
