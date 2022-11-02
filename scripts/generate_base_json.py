@@ -37,20 +37,37 @@ class Yamato2OkiConverter():
         res["index"] = [to_hiragana(tsv_row["見出し"])]
         res["kanji"] = tsv_row["見出しの漢字"]
         res["explanation"] = tsv_row["見出しの説明"]
-        res["translations"] = _parse_contents(tsv_row["内容"])
+        res["contents"] = _parse_contents(tsv_row["内容"])
         return res
 
 
+def _make_oki_item(pronunciation):
+    if is_romaji(pronunciation):
+        return {"pronunciation": pronunciation,
+                "kana": convert2kana(pronunciation),
+                "lang": "Okinawa"}
+    else:
+        return {"pronunciation": None,
+                "kana": pronunciation,
+                "lang": "Yamato"}
+    
 def _parse_contents(content_obj):
     contents_dict = {}
     translations = content_obj.split('/')
-    print(translations)
-    contents_dict["base"] = translations.pop(0).split('，')
+    base_translations = []
+    for pronunciation in translations.pop(0).strip(".").split('，'):
+        if pronunciation.startswith("→"):
+            base_translations.append(_make_oki_item(pronunciation[1:]) | {"reference": True})
+            
+        else:
+            base_translations.append(_make_oki_item(pronunciation) | {"reference": False})
+
+    contents_dict["base"] = base_translations
     contents_dict["related"] = []
     for related_str in translations:
         related_str = related_str.replace(' ', '')
         contents_dict["related"].append(_split_related_words_str(related_str))
-    print(contents_dict)
+    # print(contents_dict)
     return contents_dict
 
 
