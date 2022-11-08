@@ -42,33 +42,19 @@ class Yamato2OkiConverter():
 
 
 def _make_oki_item(pronunciation):
+    vocabulary = {"reference": False}
+    if pronunciation.startswith("→"):
+        pronunciation = pronunciation[1:]
+        vocabulary["reference"] = True
     if is_romaji(pronunciation):
-        return {"pronunciation": pronunciation,
-                "kana": convert2kana(pronunciation),
-                "lang": "Okinawa"}
+        vocabulary.update({"pronunciation": pronunciation,
+                           "kana": convert2kana(pronunciation),
+                           "lang": "Okinawa"})
     else:
-        return {"pronunciation": None,
-                "kana": pronunciation,
-                "lang": "Yamato"}
-    
-def _parse_contents(content_obj):
-    contents_dict = {}
-    translations = content_obj.split('/')
-    base_translations = []
-    for pronunciation in translations.pop(0).strip(".").split('，'):
-        if pronunciation.startswith("→"):
-            base_translations.append(_make_oki_item(pronunciation[1:]) | {"reference": True})
-            
-        else:
-            base_translations.append(_make_oki_item(pronunciation) | {"reference": False})
-
-    contents_dict["base"] = base_translations
-    contents_dict["related"] = []
-    for related_str in translations:
-        related_str = related_str.replace(' ', '')
-        contents_dict["related"].append(_split_related_words_str(related_str))
-    # print(contents_dict)
-    return contents_dict
+        vocabulary.update({"pronunciation": None,
+                           "kana": pronunciation,
+                           "lang": "Yamato"})
+    return vocabulary
 
 
 class LangMode(Enum):
@@ -131,6 +117,28 @@ def _split_related_words_str(related_words: str) -> List[str]:
         related_words = related_words[1:]
     split_word.append(current_chunk)
     return split_word
+
+
+def flatten_period(target_list):
+    nested_list = [e.split('.') for e in target_list]
+    return [e for sublist in nested_list for e in sublist]
+
+
+def _parse_contents(content_obj):
+    contents_dict = {}
+    translations = content_obj.split('/')
+    base_translations = []
+    for pronunciation in translations.pop(0).strip(".").split('，'):
+        base_translations.append(_make_oki_item(pronunciation))
+
+    contents_dict["base"] = base_translations
+    contents_dict["related"] = []
+    for related_str in translations:
+        related_str = related_str.replace(' ', '')
+        related_phrases = _split_related_words_str(related_str)
+        related_phrases = flatten_period(related_phrases)
+        contents_dict["related"].append([_make_oki_item(phrase) for phrase in related_phrases])
+    return contents_dict
 
 
 def parse_args():
