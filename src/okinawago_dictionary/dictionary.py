@@ -2,14 +2,16 @@ from abc import abstractmethod
 import json
 import os
 from typing import Dict, List
+from pathlib import Path
 
 from wanakana import to_hiragana, to_katakana
 
 
-callers_dir = os.path.abspath(os.path.curdir)
+current_dir = Path(__file__).parent
 
-oki2yamato_dict_dir = f"{callers_dir}/app/okinawago_dictionary/resources/base_lists/okinawa_01.json"
-yamata2oki_dict_dir = f"{callers_dir}/app/okinawago_dictionary/resources/base_lists/okinawa_02.json"
+oki2yamato_dict_dir = current_dir / "okinawa_01.json"
+yamata2oki_dict_dir = current_dir / "okinawa_02.json"
+
 
 with open(oki2yamato_dict_dir, 'r') as raw_file:
     raw_oki_dict = json.load(raw_file)

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "uchina_guchi_dict"
+name = "okinawago_dictionary"
 version = "0.1.0"
 description = ""
 authors = ["Hisanobu Nkamaura"]
@@ -7,17 +7,17 @@ authors = ["Hisanobu Nkamaura"]
 [tool.poetry.dependencies]
 python = "^3.10"
 openpyxl = "^3.0.10"
-ipython = "^8.4.0"
-jedi = "^0.18.1"
-yapf = "^0.32.0"
-mypy = "^0.971"
-flake8 = "^5.0.4"
-pytest = "^7.1.2"
 toml = "^0.10.2"
-pylint = "^2.15.0"
 wanakana-python = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
+mypy = "^0.991"
+jedi = "^0.18.1"
+yapf = "^0.32.0"
+flake8 = "^5.0.4"
+pytest = "^7.2.0"
+pylint = "^2.15.5"
+ipython = "^8.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
