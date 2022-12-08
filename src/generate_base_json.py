@@ -3,6 +3,7 @@ import json
 from typing import List
 from csv import DictReader
 from enum import Enum
+from pathlib import Path
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
@@ -159,6 +160,9 @@ def main():
     args = parse_args()
     converter = converter_dict[args.dict_type]
     entry_list = []
+    filename = Path(converter.source).name.replace(".tsv", ".json")
+    new_path = Path(__file__).parent / "okinawago_dictionary" / filename
+
     with open(converter.source, 'r') as base_file:
         base_tsv = DictReader(base_file, delimiter='\t')
 
@@ -166,7 +170,7 @@ def main():
             new_entry = {"id": i}
             new_entry.update(converter.convert(entry))
             entry_list.append(new_entry)
-    new_path = converter.source.replace(".tsv", ".json")
+
     with open(new_path, 'w') as base_json:
         json.dump(entry_list, base_json, ensure_ascii=False)
 
