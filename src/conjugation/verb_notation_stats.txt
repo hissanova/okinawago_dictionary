@@ -1,5 +1,5 @@
-自=raN,=ti	541
-他=raN,=ti	520
+自=raN,=ti	542
+他=raN,=ti	521
 他=saN,=ci	323
 自=kaN,=ci	72
 他=kaN,=ci	70
@@ -39,7 +39,6 @@
 他=kaN,=ci.	1
 他、他=raN,=ti	1
 自=maN,=ji	1
-他=raN=ti	1
 他=daN,=ci	1
 自=ti	1
 他=taN,=Qci、自	1
@@ -49,7 +48,6 @@
 他=saN,=ti	1
 自･他=saN,=ci	1
 動	1
-自=raN=ti	1
 自=taN,=ci	1
 自=waN,=ti	1
 他=raN,=aN,=ti	1
