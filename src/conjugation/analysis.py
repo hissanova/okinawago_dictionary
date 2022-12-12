@@ -1,20 +1,21 @@
-from typing import Dict
 from pprint import pprint
-from typing import NamedTuple, List
+from typing import Dict, NamedTuple, List
 
 from wanakana import is_japanese, is_romaji
 
 from okinawago_dictionary.dictionary import oki_dict
 
 verbs = list(
-    filter(lambda v: any(pos in v['pos'] for pos in ['自', '他', '動']),
-           oki_dict._content_dict.values()))
+    filter(
+        lambda v: any(pos in v["pos"] for pos in ["自", "他", "動"]),
+        oki_dict._content_dict.values(),
+    ))
 
 verb_types: Dict = {}
 for v in verbs:
-    pos_notation = v['pos'].replace(" ", "")
+    pos_notation = v["pos"].replace(" ", "")
     pronuncs = verb_types.setdefault(pos_notation, [])
-    verb_types[pos_notation] = pronuncs + [v['pronunciation']]
+    verb_types[pos_notation] = pronuncs + [v["pronunciation"]]
 
 conj_types = {}
 for pos, pronuncs in verb_types.items():
@@ -22,14 +23,14 @@ for pos, pronuncs in verb_types.items():
     others = set()
     for pronunc in pronuncs:
         pronunc = pronunc.replace("]", "")
-        split_word = pronunc.split('=')
+        split_word = pronunc.split("=")
         if len(split_word) == 2:
             endings.add(split_word[1])
         else:
             others.add(pronunc)
     conj_types[pos] = {"endings": endings, "others": others}
 
-with open("verb_notation_types.txt", 'w') as fp:
+with open("verb_notation_types.txt", "w") as fp:
     fp.write(str(verb_types))
 
 verb_stat = {k: len(v) for k, v in verb_types.items()}
@@ -37,9 +38,9 @@ verb_notation_stats = sorted(verb_stat.items(),
                              key=lambda item: item[1],
                              reverse=True)
 
-with open("verb_notation_stats.txt", 'w') as fp:
+with open("verb_notation_stats.txt", "w") as fp:
     for item in verb_notation_stats:
-        fp.write(item[0] + '\t' + str(item[1]) + '\n')
+        fp.write(item[0] + "\t" + str(item[1]) + "\n")
 
 
 def tokenise(notation: str) -> str:
@@ -116,21 +117,36 @@ class PartOfSpeech(NamedTuple):
 def get_conjugations(pronunciation: str, conjs: List[str]) -> Conjugation:
     conjs = [e.strip("=") for e in conjs]
     pronunc = pronunciation.replace("]", "")
-    root, ending = pronunc.split('=')
+    root, ending = pronunc.split("=")
     conj_num = len(conjs)
-    if conj_num == 0:
-        return Conjugation(Stems(root, "", "", ""), "", "", "")
-    elif conj_num == 1:
+    if conj_num == 1:
         return Conjugation(Stems(root, "", "", ""), "", "", "")
     elif conj_num == 2:
-        stems = Stems(root, root + conjs[0][0], root + ending[0],
-                      root + conjs[1][:-1])
-        return Conjugation(stems, stems.基本 + "aN", root + "i", stems.音便 + "i")
+        stems = Stems(
+            root,
+            root + conjs[0][0],
+            root + ending[0],
+            root + conjs[1][:-1],
+        )
+        return Conjugation(
+            stems,
+            stems.基本 + "aN",
+            root + "i",
+            stems.音便 + "i",
+        )
     elif conj_num == 3:
-        stems = Stems(root, root + conjs[0][0] + '/' + root + conjs[1][0],
-                      root + ending[0], root + conjs[2][:-1])
-        return Conjugation(stems, root + conjs[0] + "/" + root + conjs[1],
-                           root + "i", root + conjs[2])
+        stems = Stems(
+            root,
+            root + conjs[0][0] + "/" + root + conjs[1][0],
+            root + ending[0],
+            root + conjs[2][:-1],
+        )
+        return Conjugation(
+            stems,
+            root + conjs[0] + "/" + root + conjs[1],
+            root + "i",
+            root + conjs[2],
+        )
     else:
         raise ValueError(f"{pronunciation}, {conjs}")
 
@@ -141,31 +157,49 @@ def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
         notation, remark = notation.split("/")
     if notation.startswith("自･不規則"):
         return PartOfSpeech(
-            "自･不規則", Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
-            remark)
+            "自･不規則",
+            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
+            remark,
+        )
     elif notation.startswith("他･不規則"):
         return PartOfSpeech(
-            "他･不規則", Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
-            remark)
+            "他･不規則",
+            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
+            remark,
+        )
     elif notation.startswith("自･他") or notation.startswith("他･自"):
         pos_type, conjs = notation[2], notation[3:].split(",")
-        return PartOfSpeech(pos_type, get_conjugations(pronunciation, conjs),
-                            remark)
-    elif len(notation) > 1 and (notation.startswith("自")
-                                or notation.startswith("他")):
-        pos_type, conjs = notation[0], notation[1:].split(",")
-        return PartOfSpeech(pos_type, get_conjugations(pronunciation, conjs),
-                            remark)
-    else:
         return PartOfSpeech(
-            notation, Conjugation(Stems(pronunciation, "", "", ""), "", "",
-                                  ""), remark)
+            pos_type,
+            get_conjugations(pronunciation, conjs),
+            remark,
+        )
+    elif len(notation) == 1:
+        return PartOfSpeech(
+            notation,
+            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
+            remark,
+        )
+    else:
+        pos_type, conjs = notation[0], notation[1:].split(",")
+        return PartOfSpeech(
+            pos_type,
+            get_conjugations(pronunciation, conjs),
+            remark,
+        )
 
 
+count = 0
+ends_with_a = []
 for v in verbs[:]:
     pronunc = v["pronunciation"]
-    pos_notation = v['pos'].replace(" ", "")
+    pos_notation = v["pos"].replace(" ", "")
     if pos_notation.count("=") == 3:
+        count += 1
         pprint([pronunc, pos_notation])
+        print(f"Root ends with -a?:{pronunc.split('=')[0].endswith('a')}")
+        ends_with_a.append(pronunc.split("=")[0].endswith("a"))
         part_of_speech = parse_pos_notation(pronunc, pos_notation)
-        pprint(part_of_speech)
+        # pprint(part_of_speech)
+
+print(count, all(ends_with_a))

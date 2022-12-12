@@ -13,11 +13,13 @@ wanakana-python = "^1.2.2"
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
 jedi = "^0.18.1"
-yapf = "^0.32.0"
 flake8 = "^5.0.4"
 pytest = "^7.2.0"
 pylint = "^2.15.5"
 ipython = "^8.6.0"
+black = "^22.12.0"
+autopep8 = "^2.0.0"
+yapf = "^0.32.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
