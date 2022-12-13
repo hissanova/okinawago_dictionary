@@ -1,9 +1,10 @@
 from pprint import pprint
-from typing import Dict, NamedTuple, List
+from typing import Dict
 
-from wanakana import is_japanese, is_romaji
+from wanakana import is_japanese
 
 from okinawago_dictionary.dictionary import oki_dict
+from conjugations import parse_pos_notation
 
 verbs = list(
     filter(
@@ -93,113 +94,17 @@ def tokenise(notation: str) -> str:
 #     print("Else")
 #     print(f"\tnotation:{notation}")
 
-
-class Stems(NamedTuple):
-    語根: str
-    基本: str
-    連用: str
-    音便: str
-
-
-class Conjugation(NamedTuple):
-    stems: Stems
-    否定形: str
-    連用形: str
-    てぃ形: str
-
-
-class PartOfSpeech(NamedTuple):
-    type: str
-    conjugation: Conjugation
-    remark: str
-
-
-def get_conjugations(pronunciation: str, conjs: List[str]) -> Conjugation:
-    conjs = [e.strip("=") for e in conjs]
-    pronunc = pronunciation.replace("]", "")
-    root, ending = pronunc.split("=")
-    conj_num = len(conjs)
-    if conj_num == 1:
-        return Conjugation(Stems(root, "", "", ""), "", "", "")
-    elif conj_num == 2:
-        stems = Stems(
-            root,
-            root + conjs[0][0],
-            root + ending[0],
-            root + conjs[1][:-1],
-        )
-        return Conjugation(
-            stems,
-            stems.基本 + "aN",
-            root + "i",
-            stems.音便 + "i",
-        )
-    elif conj_num == 3:
-        stems = Stems(
-            root,
-            root + conjs[0][0] + "/" + root + conjs[1][0],
-            root + ending[0],
-            root + conjs[2][:-1],
-        )
-        return Conjugation(
-            stems,
-            root + conjs[0] + "/" + root + conjs[1],
-            root + "i",
-            root + conjs[2],
-        )
-    else:
-        raise ValueError(f"{pronunciation}, {conjs}")
-
-
-def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
-    remark = ""
-    if "/" in pos_notation:
-        notation, remark = notation.split("/")
-    if notation.startswith("自･不規則"):
-        return PartOfSpeech(
-            "自･不規則",
-            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
-            remark,
-        )
-    elif notation.startswith("他･不規則"):
-        return PartOfSpeech(
-            "他･不規則",
-            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
-            remark,
-        )
-    elif notation.startswith("自･他") or notation.startswith("他･自"):
-        pos_type, conjs = notation[2], notation[3:].split(",")
-        return PartOfSpeech(
-            pos_type,
-            get_conjugations(pronunciation, conjs),
-            remark,
-        )
-    elif len(notation) == 1:
-        return PartOfSpeech(
-            notation,
-            Conjugation(Stems(pronunciation, "", "", ""), "", "", ""),
-            remark,
-        )
-    else:
-        pos_type, conjs = notation[0], notation[1:].split(",")
-        return PartOfSpeech(
-            pos_type,
-            get_conjugations(pronunciation, conjs),
-            remark,
-        )
-
-
 count = 0
 ends_with_a = []
 for v in verbs[:]:
     pronunc = v["pronunciation"]
     pos_notation = v["pos"].replace(" ", "")
-    if pos_notation.count("=") == 3:
+    if pos_notation.count("=") == 0:
         count += 1
         pprint([pronunc, pos_notation])
-        print(f"Root ends with -a?:{pronunc.split('=')[0].endswith('a')}")
+        # print(f"Root ends with -a?:{pronunc.split('=')[0].endswith('a')}")
         ends_with_a.append(pronunc.split("=")[0].endswith("a"))
         part_of_speech = parse_pos_notation(pronunc, pos_notation)
-        # pprint(part_of_speech)
+        pprint(part_of_speech)
 
 print(count, all(ends_with_a))
