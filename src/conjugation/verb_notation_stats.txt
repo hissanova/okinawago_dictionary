@@ -1,4 +1,4 @@
-自=raN,=ti	544
+自=raN,=ti	543
 他=raN,=ti	522
 他=saN,=ci	323
 自=kaN,=ci	72
@@ -57,3 +57,4 @@
 他=raN,=ti/?umaaNともいう	1
 他･自=aN,=raN,=ti	1
 他=gan,=zi	1
+自=raN,=ti/元の記載では'wacaku	1

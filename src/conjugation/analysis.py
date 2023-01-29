@@ -6,11 +6,13 @@ from wanakana import is_japanese
 from okinawago_dictionary.dictionary import oki_dict
 from conjugations import parse_pos_notation, irregular_verb_conjs
 
+
+def is_verb(pos: str) -> bool:
+    return any(v_type in pos for v_type in ["自", "他", "動"])
+
+
 verbs = list(
-    filter(
-        lambda v: any(pos in v["pos"] for pos in ["自", "他", "動"]),
-        oki_dict._content_dict.values(),
-    ))
+    filter(lambda v: is_verb(v["pos"]), oki_dict._content_dict.values()))
 
 verb_types: Dict = {}
 for v in verbs:
@@ -53,17 +55,21 @@ ends_with_a = []
 for v in verbs[:]:
     pronunc = v["pronunciation"]
     pos_notation = v["pos"].replace(" ", "")
-    if pos_notation.count("=") == 0:
-        count += 1
-        print(pronunc, pos_notation, end="")
-        if irregular_verb_conjs.get(pronunc, False):
-            print("")
-        else:
-            print("\tNo description yet")
-        # print(f"Root ends with -a?:{pronunc.split('=')[0].endswith('a')}")
-        ends_with_a.append(pronunc.split("=")[0].endswith("a"))
-        part_of_speech = parse_pos_notation(pronunc, pos_notation)
-        # print("\t", end="")
-        # pprint(part_of_speech)
+    pos = parse_pos_notation(pronunc, pos_notation)
+    print(pronunc, pos_notation)
+    print(pos)
+    # if pos_notation.count("=") == 0:
+    #     count += 1
+    #     print(pronunc, pos_notation, end="")
+    #     if irregular_verb_conjs.get(pronunc, False):
+    #         print("")
+    #     else:
+    #         print("\tNo description yet")
+    #     # print(f"Root ends with -a?:{pronunc.split('=')[0].endswith('a')}")
+    #     ends_with_a.append(pronunc.split("=")[0].endswith("a"))
+    #     part_of_speech = parse_pos_notation(pronunc, pos_notation)
+    #     print("\t", end="")
+    #     pprint(part_of_speech)
+    #     print("")
 
-print(count, all(ends_with_a))
+# print(count, all(ends_with_a))

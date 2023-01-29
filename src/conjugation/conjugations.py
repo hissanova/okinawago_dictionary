@@ -221,17 +221,17 @@ sonkei_verbs = {
 
 irregular_verb_conjs.update(sonkei_verbs)
 
-unknown_cnoj_verbs = ["?acizaraN", "dijoori", "SiiraraN", "SiziraraN", "teewa"]
+no_conj_verbs = ["?acizaraN", "dijoori", "SiiraraN", "SiziraraN", "teewa"]
 null_conjugation = Conjugation(Stems("", "", "", ""), {}, {}, {})
-irregular_verb_conjs.update({v: null_conjugation for v in unknown_cnoj_verbs})
+irregular_verb_conjs.update({v: null_conjugation for v in no_conj_verbs})
 
 
 def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
-    if pronunciation in unknown_cnoj_verbs:
+    if pronunciation in no_conj_verbs:
         return PartOfSpeech(
             notation,
             irregular_verb_conjs[pronunciation],
-            "活用はない。",
+            "活用なし。",
         )
     remark = ""
     if "/" in notation:
@@ -239,13 +239,13 @@ def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
     if notation.startswith("自･不規則"):
         return PartOfSpeech(
             "自･不規則",
-            irregular_verb_conjs.get(pronunciation, null_conjugation),
+            irregular_verb_conjs[pronunciation],
             remark,
         )
     elif notation.startswith("他･不規則"):
         return PartOfSpeech(
             "他･不規則",
-            irregular_verb_conjs.get(pronunciation, null_conjugation),
+            irregular_verb_conjs[pronunciation],
             remark,
         )
     elif notation.startswith("自･他") or notation.startswith("他･自"):
@@ -256,11 +256,13 @@ def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
             remark,
         )
     elif len(notation) == 1:
-        return PartOfSpeech(
-            notation,
-            null_conjugation,
-            remark,
-        )
+        raise NotImplementedError
+        # print("HOGE")
+        # return PartOfSpeech(
+        #     notation,
+        #     null_conjugation,
+        #     remark,
+        # )
     else:
         pos_type, conjs = notation[0], notation[1:].split(",")
         return PartOfSpeech(
