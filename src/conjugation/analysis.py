@@ -8,7 +8,7 @@ from conjugations import parse_pos_notation, irregular_verb_conjs
 
 
 def is_verb(pos: str) -> bool:
-    return any(v_type in pos for v_type in ["自", "他", "動"])
+    return any(v_type in pos for v_type in ["自", "他", "動", "接尾=", "接尾･不規則"])
 
 
 verbs = list(
@@ -55,9 +55,9 @@ ends_with_a = []
 for v in verbs[:]:
     pronunc = v["pronunciation"]
     pos_notation = v["pos"].replace(" ", "")
-    pos = parse_pos_notation(pronunc, pos_notation)
     print(pronunc, pos_notation)
-    print(pos)
+    pos = parse_pos_notation(pronunc, pos_notation)
+    print(pos.to_dict())
     # if pos_notation.count("=") == 0:
     #     count += 1
     #     print(pronunc, pos_notation, end="")

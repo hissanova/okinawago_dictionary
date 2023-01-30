@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, List
+from typing import Dict, NamedTuple, List, Optional
 
 
 class Stems(NamedTuple):
@@ -7,6 +7,9 @@ class Stems(NamedTuple):
     連用: str
     音便: str
 
+    def to_dict(self):
+        return {"語幹": self.語根, "基本": self.基本, "連用": self.連用, "音便": self.音便}
+
 
 class Conjugation(NamedTuple):
     stems: Stems
@@ -14,11 +17,27 @@ class Conjugation(NamedTuple):
     連用派生形: Dict[str, str]
     音便派生形: Dict[str, str]
 
+    def to_dict(self):
+        return {
+            "stems": self.stems.to_dict(),
+            "基本派生形": self.基本派生形,
+            "連用派生形": self.連用派生形,
+            "音便派生形": self.音便派生形
+        }
+
 
 class PartOfSpeech(NamedTuple):
     type: str
-    conjugation: Conjugation
+    conjugation: Optional[Conjugation]
     remark: str
+
+    def to_dict(self):
+        return {
+            "type": self.type,
+            "conjugation":
+            self.conjugation.to_dict() if self.conjugation else None,
+            "remark": self.remark
+        }
 
 
 kihonkei_suffixes = {"否定形": "aN"}
@@ -76,6 +95,39 @@ def get_conjugations(pronunciation: str, conjs: List[str]) -> Conjugation:
 
 
 irregular_verb_conjs = {
+    "-abijuN":
+    Conjugation(
+        Stems("", "-abir", "-abij", "-abit|-abiit"),
+        {"否定形": "-abiraN"},
+        {"連用形": "-abiii"},
+        {
+            "過去形(単純)": "-abitaN",
+            "過去形(継続)": "-abiitaN",
+            "て形": "-abiti",
+        },
+    ),
+    "-agijuN":
+    Conjugation(
+        Stems("", "-agir", "-agij", "-agit|-agiit"),
+        {"否定形": "-agiraN"},
+        {"連用形": "-agii"},
+        {
+            "過去形(継続)": "-agiitaN",
+            "て形": "-agiti",
+            "継続形": "-agitooN"
+        },
+    ),
+    "-juusjuN":
+    Conjugation(
+        Stems("", "-juus", "-juus", "-juus"),
+        {"否定形": "-juusaN"},
+        {"連用形": "-juusii"},
+        {
+            "過去形": "-juusjaN",
+            "て形": "-juuQsi",
+            "継続形": "-juusjooN"
+        },
+    ),
     "sjuN":
     Conjugation(
         Stems("", "s|Qs", "s|sj", "sj"),
@@ -180,6 +232,10 @@ irregular_verb_conjs = {
     conjugate_from(Stems("", "moor", "mooj", "mooc")),
     "miSeeN":
     conjugate_from(Stems("", "misjoor", "miSeej", "misjooc")),
+    "-miSe]eN":
+    conjugate_from(Stems("", "-misjoor", "-miSeej", "-misjooc")),
+    "-NSe]eN":
+    conjugate_from(Stems("", "-Nsjoor", "-NSeej", "-Nsjooc")),
     "?meNSeeN":
     conjugate_from(Stems("", "?meNsjoor", "?meNSeej", "?meNsjooc")),
     "?imeNSeeN":
@@ -226,45 +282,41 @@ null_conjugation = Conjugation(Stems("", "", "", ""), {}, {}, {})
 irregular_verb_conjs.update({v: null_conjugation for v in no_conj_verbs})
 
 
-def parse_pos_notation(pronunciation: str, notation: str) -> PartOfSpeech:
+def parse_pos_notation(pronunciation: str, pos_notation: str) -> PartOfSpeech:
     if pronunciation in no_conj_verbs:
         return PartOfSpeech(
-            notation,
+            pos_notation,
             irregular_verb_conjs[pronunciation],
             "活用なし。",
         )
     remark = ""
-    if "/" in notation:
-        notation, remark = notation.split("/")
-    if notation.startswith("自･不規則"):
+    if "/" in pos_notation:
+        pos_notation, remark = pos_notation.split("/")
+    if any("{}･不規則".format(v_type) in pos_notation
+           for v_type in ["自", "他", "接尾"]):
         return PartOfSpeech(
-            "自･不規則",
+            pos_notation,
             irregular_verb_conjs[pronunciation],
             remark,
         )
-    elif notation.startswith("他･不規則"):
+    elif pos_notation.startswith("接尾"):
+        pos_type, conjs = pos_notation[:2], pos_notation[2:].split(",")
         return PartOfSpeech(
-            "他･不規則",
-            irregular_verb_conjs[pronunciation],
+            "接尾動詞",
+            get_conjugations(pronunciation, conjs),
             remark,
         )
-    elif notation.startswith("自･他") or notation.startswith("他･自"):
-        pos_type, conjs = notation[2], notation[3:].split(",")
+    elif any(pos_notation.startswith(v_type) for v_type in ["自･他", "他･自"]):
+        pos_type, conjs = pos_notation[:3], pos_notation[3:].split(",")
         return PartOfSpeech(
             pos_type,
             get_conjugations(pronunciation, conjs),
             remark,
         )
-    elif len(notation) == 1:
+    elif len(pos_notation) == 1:
         raise NotImplementedError
-        # print("HOGE")
-        # return PartOfSpeech(
-        #     notation,
-        #     null_conjugation,
-        #     remark,
-        # )
     else:
-        pos_type, conjs = notation[0], notation[1:].split(",")
+        pos_type, conjs = pos_notation[0], pos_notation[1:].split(",")
         return PartOfSpeech(
             pos_type,
             get_conjugations(pronunciation, conjs),
