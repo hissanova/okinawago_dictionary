@@ -4,12 +4,7 @@ from typing import Dict
 from wanakana import is_japanese
 
 from okinawago_dictionary.dictionary import oki_dict
-from conjugations import parse_pos_notation, irregular_verb_conjs
-
-
-def is_verb(pos: str) -> bool:
-    return any(v_type in pos for v_type in ["自", "他", "動", "接尾=", "接尾･不規則"])
-
+from conjugations import parse_pos_notation, irregular_verb_conjs, is_verb
 
 verbs = list(
     filter(lambda v: is_verb(v["pos"]), oki_dict._content_dict.values()))
