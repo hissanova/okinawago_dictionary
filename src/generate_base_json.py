@@ -4,10 +4,12 @@ from typing import List
 from csv import DictReader
 from enum import Enum
 from pathlib import Path
+from pprint import pprint
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
 from kanahyouki import convert2kana
+from pos import get_pos
 
 
 class Oki2YamatoConverter():
@@ -17,10 +19,11 @@ class Oki2YamatoConverter():
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
         pronuc = tsv_row["見出し語"]
+        pos = get_pos(tsv_row["品詞"], pronuc)
+        res["pos"] = pos.to_dict()
         res["pronunciation"] = pronuc
         res["index"] = convert2kana(pronuc)
         res["accent"] = tsv_row["アクセント型"]
-        res["pos"] = tsv_row["品詞"]
         res["bungo-type"] = tsv_row["文語などの\n種別"]
         res["amendment"] = tsv_row["補足"]
         keys = ['意味 1.', '意味 2.', '意味 3.', '意味 4.', '意味 5.']
@@ -48,13 +51,17 @@ def _make_oki_item(pronunciation):
         pronunciation = pronunciation[1:]
         vocabulary["reference"] = True
     if is_romaji(pronunciation):
-        vocabulary.update({"pronunciation": pronunciation,
-                           "kana": convert2kana(pronunciation),
-                           "lang": "Okinawa"})
+        vocabulary.update({
+            "pronunciation": pronunciation,
+            "kana": convert2kana(pronunciation),
+            "lang": "Okinawa"
+        })
     else:
-        vocabulary.update({"pronunciation": None,
-                           "kana": pronunciation,
-                           "lang": "Yamato"})
+        vocabulary.update({
+            "pronunciation": None,
+            "kana": pronunciation,
+            "lang": "Yamato"
+        })
     return vocabulary
 
 
@@ -138,7 +145,8 @@ def _parse_contents(content_obj):
         related_str = related_str.replace(' ', '')
         related_phrases = _split_related_words_str(related_str)
         related_phrases = flatten_period(related_phrases)
-        contents_dict["related"].append([_make_oki_item(phrase) for phrase in related_phrases])
+        contents_dict["related"].append(
+            [_make_oki_item(phrase) for phrase in related_phrases])
     return contents_dict
 
 
