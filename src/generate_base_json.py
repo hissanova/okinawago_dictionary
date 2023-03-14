@@ -168,7 +168,7 @@ def main():
     args = parse_args()
     converter = converter_dict[args.dict_type]
     entry_list = []
-    filename = Path(converter.source).name.replace(".tsv", ".jsonl")
+    filename = Path(converter.source).name.replace(".tsv", ".json")
     new_path = Path(__file__).parent / "okinawago_dictionary" / filename
 
     with open(converter.source, 'r') as base_file:
@@ -180,9 +180,7 @@ def main():
             entry_list.append(new_entry)
 
     with open(new_path, 'w') as base_json:
-        for entry in entry_list:
-            json.dump(entry, base_json, ensure_ascii=False)
-            base_json.write("\n")
+        json.dump(entry_list, base_json, ensure_ascii=False)
 
 
 if __name__ == "__main__":

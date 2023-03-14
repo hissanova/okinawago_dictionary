@@ -22,6 +22,7 @@ class PartOfSpeech(NamedTuple):
 
 
 def parse_pos_notation(pronunciation: str, pos_notation: str) -> PartOfSpeech:
+    pos_notation = pos_notation.replace(" ", "")
     if pronunciation in no_conj_verbs:
         return PartOfSpeech(
             pos_notation,
