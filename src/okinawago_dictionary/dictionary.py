@@ -1,6 +1,5 @@
 from abc import abstractmethod
 import json
-import os
 from typing import Dict, List
 from pathlib import Path
 
@@ -11,13 +10,16 @@ current_dir = Path(__file__).parent
 
 oki2yamato_dict_dir = current_dir / "okinawa_01.json"
 yamata2oki_dict_dir = current_dir / "okinawa_02.json"
-
+katsuyou_jiten_dir = current_dir / "katsuyou_jiten.json"
 
 with open(oki2yamato_dict_dir, 'r') as raw_file:
     raw_oki_dict = json.load(raw_file)
 
 with open(yamata2oki_dict_dir, 'r') as raw_file:
     raw_yamato_dict = json.load(raw_file)
+
+with open(katsuyou_jiten_dir, 'r') as raw_file:
+    raw_katsuyou_jiten = json.load(raw_file)
 
 
 class Dictionary:
@@ -69,5 +71,17 @@ class YamatogoDictionary(Dictionary):
         return to_hiragana(kana_str)
 
 
+class KatsuyouDictionary(Dictionary):
+    """Documentation for YamatoDictionary
+
+    """
+    def __init__(self, raw_yamato_dict):
+        super(KatsuyouDictionary, self).__init__(raw_katsuyou_jiten)
+
+    def normalise_kana(self, kana_str: str) -> str:
+        return to_katakana(kana_str)
+
+
 oki_dict = OkinawagoDictionary(raw_oki_dict)
 yamato_dict = YamatogoDictionary(raw_yamato_dict)
+katsuyou_jiten = KatsuyouDictionary(raw_katsuyou_jiten)
