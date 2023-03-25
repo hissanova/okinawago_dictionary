@@ -9,6 +9,8 @@ python = "^3.10"
 openpyxl = "^3.0.10"
 toml = "^0.10.2"
 wanakana-python = "^1.2.2"
+pdfminer = "^20191125"
+"pdfminer.six" = "^20221105"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
