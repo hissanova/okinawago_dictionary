@@ -2,15 +2,16 @@ import argparse
 from collections import Counter, defaultdict
 import json
 import re
-from pprint import pprint
-from typing import Dict
+from typing import Dict, List, Sequence
 
+# regex で \w と見做されない unicode 文字リスト
+non_alnum_chs = [
+    '「', '⺟', '\u2003', '＝', '］', '⻨', '。', '⻑', '⻄', '-', '！', '〉', '\[', '〜',
+    '⻭', '⻲', '⺠', '⻤', '…', '・', '≒', '．', '［', '〈', '⺒', '？', '」', '/', '⻯',
+    '.', '*', '\]', '：', '‘', '⻫', '⻩', '̶', '’', '⻘', '、', ':', '／', '；'
+]
 
-non_alnum_chs = ['「', '⺟', '\u2003', '＝', '］', '⻨', '。', '⻑', '⻄', '-', '！', '〉', '\[', '〜', '⻭', '⻲', '⺠', '⻤', '…', '・', '≒', '．', '［', '〈', '⺒', '？', '」', '/', '⻯', '.', '*', '\]', '：', '‘', '⻫', '⻩', '̶', '’', '⻘', '、', ':', '／', '；']
-
-# print(r"\(([\w" + r"".join(non_alnum_chs) + r"]+)\)")
-
-
+# 各章の初めと終わりのページ。
 chapters = [
     {
         "title": "名詞･動詞編",
@@ -26,9 +27,12 @@ chapters = [
     },
 ]
 
+# 全角丸カッコ"（）"から半角丸括弧"()"への変換テーブル
+uni_bra_to_ascii_bra = str.maketrans(dict([("（", "("), ("）", ")")]))
 
-def separate_variations(index):
-    index = index.replace("（", "(").replace("）", ")")
+
+def separate_variations(index: str) -> List[str]:
+    index = index.translate(uni_bra_to_ascii_bra)
     return list(
         set([
             "".join(re.split(r"\(\w+\)", index)),
@@ -36,7 +40,7 @@ def separate_variations(index):
         ]))
 
 
-def split_recur(st, spl_lst):
+def split_recur(st: str, spl_lst: List[str]) -> List[str]:
     if not spl_lst:
         return separate_variations(st)
     else:
@@ -46,7 +50,7 @@ def split_recur(st, spl_lst):
         ]
 
 
-def is_in(val, interval) -> bool:
+def is_in(val: int, interval: Sequence[int]) -> bool:
     return interval[0] <= val <= interval[1]
 
 
@@ -66,17 +70,17 @@ def add_pos(item):
 
 def decompose_sample_sentences(contents):
     decomposed = []
-    # print(contents)
-    contents = contents.replace("。", "").replace("（", "(").replace("）", ")")
+    contents = contents.replace("。", "").translate(uni_bra_to_ascii_bra)
     letters = r"[\w" + r"".join(non_alnum_chs) + "]*"
     pattern = r"\((" + letters + r"(?:\(" + letters + r"\))?" + letters + r")\)、?"
     split_contents = re.split(pattern, contents)[:-1]
-    # print(len(split_contents))
-    # pprint(split_contents)
     for k in range(0, len(split_contents), 2):
-        decomposed.append({"okinawa": split_contents[k] + "。",
-                           "yamato": split_contents[k + 1] + "。"})
+        decomposed.append({
+            "okinawa": split_contents[k] + "。",
+            "yamato": split_contents[k + 1] + "。"
+        })
     return decomposed
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -134,7 +138,11 @@ def main():
             if section_head == "【活】":
 
                 def decompose_verb_conj(contents):
-                    return {c_type: conj for c_type, conj in zip(["過去形", "否定形", "てぃ形"], contents.split("、"))}
+                    return {
+                        c_type: conj
+                        for c_type, conj in zip(["過去形", "否定形", "てぃ形"],
+                                                contents.split("、"))
+                    }
 
                 item["conjugation"] = decompose_verb_conj(section)
             elif section_head == "【例】":
