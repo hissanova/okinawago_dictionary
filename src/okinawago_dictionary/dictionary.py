@@ -59,7 +59,7 @@ class OkinawagoDictionary(Dictionary):
         super(OkinawagoDictionary, self).__init__(raw_oki_dict)
 
     def normalise_kana(self, kana_str: str) -> str:
-        return to_katakana(kana_str)
+        return "".join([c if c == "’" else to_katakana(c) for c in kana_str])
 
 
 class YamatogoDictionary(Dictionary):
