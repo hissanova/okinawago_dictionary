@@ -26,6 +26,18 @@ others = {' ', '(', ')', ',', '-', '=', ']'}
 
 exceptions = ["hNN"]  # 発音記号の例外
 
+with open("resources/kana-table.json", 'r') as kana_list_file:
+    pronunc_kana_dict = json.load(kana_list_file)
+
+long_vowel_dict = {}
+for pronunc, kana_list in pronunc_kana_dict.items():
+    if any(pronunc.endswith(vowel) for vowel in vowels):
+        pronunc += pronunc[-1]
+        kana_list = [kana + "ー" for kana in kana_list]
+        long_vowel_dict[pronunc] = kana_list
+
+pronunc_kana_dict.update(long_vowel_dict)
+
 
 def _delete_others(pronunciation: str) -> str:
     """発音記号の文字列から、子音、半母音、母音以外の文字を消去します。"""
@@ -84,6 +96,11 @@ def split_into_moras(pronunciation: str) -> List[str]:
     return moras
 
 
+class PhonemeSymols(NamedTuple):
+    simplified: str
+    original: str
+
+
 class Pronunciation(NamedTuple):
     ipa: str
     kana: str
@@ -95,7 +112,7 @@ class SocialClass(Enum):
 
 
 class WordPhonetics(NamedTuple):
-    phoneme: str
+    phonemes: PhonemeSymols
     pronunciations: Dict[SocialClass, Pronunciation]
 
 
@@ -104,22 +121,35 @@ excel2Original_dict = {
     "C": "ç",
     "Z": "ʐ",
     "S": "ş",
-    "]": "<sup>¬</sup>"
 }
 
 
 def get_original_phonemes(phoneme_symbols_in_excel: str) -> str:
-    return "Original Phonemes in the book."
+    return phoneme_symbols_in_excel.translate({
+        ord(k): ord(v)
+        for k, v in excel2Original_dict.items()
+    }).replace("]", "<sup>¬</sup>")
+
+
+def mora2kana(mora: str) -> str:
+    return "ほ"
 
 
 def get_ipa_n_kana(phoneme_symbols_in_excel: str,
                    social_class: SocialClass) -> Pronunciation:
-    return Pronunciation("", "")
+    moras = split_into_moras(phoneme_symbols_in_excel)
+    return Pronunciation(
+        "",
+        "".join(list(map(mora2kana, moras))),
+    )
 
 
 def generate_phonetics(phoneme_symbols_in_excel: str) -> WordPhonetics:
     return WordPhonetics(
-        get_original_phonemes(phoneme_symbols_in_excel),
+        PhonemeSymols(
+            phoneme_symbols_in_excel,
+            get_original_phonemes(phoneme_symbols_in_excel),
+        ),
         {
             s_class: get_ipa_n_kana(phoneme_symbols_in_excel, s_class)
             for s_class in SocialClass
@@ -129,17 +159,6 @@ def generate_phonetics(phoneme_symbols_in_excel: str) -> WordPhonetics:
 
 def convert2kana(pronunciation: str) -> List[str]:
     """発音記号をかな表記に変換します。"""
-    with open("resources/kana-table.json", 'r') as kana_list_file:
-        pronunc_kana_dict = json.load(kana_list_file)
-
-    long_vowel_dict = {}
-    for pronunc, kana_list in pronunc_kana_dict.items():
-        if any(pronunc.endswith(vowel) for vowel in vowels):
-            pronunc += pronunc[-1]
-            kana_list = [kana + "ー" for kana in kana_list]
-        long_vowel_dict[pronunc] = kana_list
-
-    pronunc_kana_dict.update(long_vowel_dict)
     if pronunciation in exceptions:
         return ["フンー"]
 
