@@ -8,7 +8,8 @@ word::=mora+...
 - v:semi-vowel
 - V:vowel
 """
-from typing import List, Tuple
+from typing import Dict, List, NamedTuple, Tuple
+from enum import Enum
 import json
 from itertools import product
 
@@ -81,6 +82,49 @@ def split_into_moras(pronunciation: str) -> List[str]:
         mora, chr_list = _check_glottal_stop(chr_list)
         moras.append(mora)
     return moras
+
+
+class Pronunciation(NamedTuple):
+    ipa: str
+    kana: str
+
+
+class SocialClass(Enum):
+    HEIMIN = 1
+    SHIZOKU = 2
+
+
+class WordPhonetics(NamedTuple):
+    phoneme: str
+    pronunciations: Dict[SocialClass, Pronunciation]
+
+
+excel2Original_dict = {
+    "?": "ʔ",
+    "C": "ç",
+    "Z": "ʐ",
+    "S": "ş",
+    "]": "<sup>¬</sup>"
+}
+
+
+def get_original_phonemes(phoneme_symbols_in_excel: str) -> str:
+    return "Original Phonemes in the book."
+
+
+def get_ipa_n_kana(phoneme_symbols_in_excel: str,
+                   social_class: SocialClass) -> Pronunciation:
+    return Pronunciation("", "")
+
+
+def generate_phonetics(phoneme_symbols_in_excel: str) -> WordPhonetics:
+    return WordPhonetics(
+        get_original_phonemes(phoneme_symbols_in_excel),
+        {
+            s_class: get_ipa_n_kana(phoneme_symbols_in_excel, s_class)
+            for s_class in SocialClass
+        },
+    )
 
 
 def convert2kana(pronunciation: str) -> List[str]:
