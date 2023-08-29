@@ -44,6 +44,8 @@ for d in pronunc_table:
     #         print(d)
     if len(ipas) == 2:
         kanas.update({"HEIMIN": kana[:-1], "SHIZOKU": kana[-1:]})
+        if romans[0] == "Zu":
+            kanas["SHIZOKU"] += "ヅ"
     else:
         kanas.update({"HEIMIN": kana})
     d.update({"IPA": ipas})
