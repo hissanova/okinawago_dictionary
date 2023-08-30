@@ -33,7 +33,7 @@ for d in pronunc_table:
     if len(romans) == 1:
         r = romans[0]
         if r[0] == "?" and romans[0][1] not in ["a", "i", "u", "e", "o"]:
-            print(d)
+            # print(d)
             syllables = list({syllable[1:] for syllable in kana})
             kana = [
                 "".join(chrs) for chrs in product(glottal_stop_syms, syllables)
@@ -44,6 +44,7 @@ for d in pronunc_table:
     #         print(d)
     if len(ipas) == 2:
         kanas.update({"HEIMIN": kana[:-1], "SHIZOKU": kana[-1:]})
+        print(ipas, kanas)
         if romans[0] == "Zu":
             kanas["SHIZOKU"] += "ヅ"
     else:
