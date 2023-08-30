@@ -38,6 +38,16 @@ for pronunc, kana_list in pronunc_kana_dict.items():
 
 pronunc_kana_dict.update(long_vowel_dict)
 
+with open("resources/phonetics-table.json", 'r') as table:
+    phonetics_dict = json.load(table)
+
+roman_to_kana_n_ipa = {}
+for entry in phonetics_dict:
+    romans = entry["roman"]
+    entry.pop("roman")
+    for roman in romans:
+        roman_to_kana_n_ipa[roman] = entry
+
 
 def _delete_others(pronunciation: str) -> str:
     """発音記号の文字列から、子音、半母音、母音以外の文字を消去します。"""
@@ -100,20 +110,35 @@ class PhonemeSymols(NamedTuple):
     simplified: str
     original: str
 
+    def to_dict(self):
+        return {"simplified": self.simplified, "original": self.original}
+
 
 class Pronunciation(NamedTuple):
     ipa: str
-    kana: str
+    kana: List[str]
+
+    def to_dict(self):
+        return {"IPA": self.ipa, "kana": self.kana}
 
 
 class SocialClass(Enum):
-    HEIMIN = 1
-    SHIZOKU = 2
+    HEIMIN = "HEIMIN"
+    SHIZOKU = "SHIZOKU"
 
 
 class WordPhonetics(NamedTuple):
     phonemes: PhonemeSymols
     pronunciations: Dict[SocialClass, Pronunciation]
+
+    def to_dict(self):
+        return {
+            "phonemes": self.phonemes.to_dict(),
+            "pronunciation": {
+                s_class.value: pronunc.to_dict()
+                for s_class, pronunc in self.pronunciations.items()
+            }
+        }
 
 
 excel2Original_dict = {
@@ -131,17 +156,62 @@ def get_original_phonemes(phoneme_symbols_in_excel: str) -> str:
     }).replace("]", "<sup>¬</sup>")
 
 
-def mora2kana(mora: str) -> str:
-    return "ほ"
+def _contain_long_vowel(mora: str) -> bool:
+    return any(mora.count(v) > 1 for v in vowels)
 
 
-def get_ipa_n_kana(phoneme_symbols_in_excel: str,
-                   social_class: SocialClass) -> Pronunciation:
-    moras = split_into_moras(phoneme_symbols_in_excel)
-    return Pronunciation(
-        "",
-        "".join(list(map(mora2kana, moras))),
+def _add_char_to_all(word_list: List[str], char: str) -> List[str]:
+    return [word + char for word in word_list]
+
+
+def mora2kana_n_IPA(mora: str) -> Tuple[List[List[str]], List[str]]:
+    long_vowel_sym = ["", ""]
+    if _contain_long_vowel(mora):
+        mora = mora[:-1]
+        long_vowel_sym = ["ー", "ː"]
+    kana_n_ipa = roman_to_kana_n_ipa[mora]
+    return (
+        [
+            _add_char_to_all(k, long_vowel_sym[0])
+            for k in kana_n_ipa["kana"].values()
+        ],
+        [ipa + long_vowel_sym[1] for ipa in kana_n_ipa["IPA"].values()],
     )
+
+
+def get_ipa_n_kana(
+        phoneme_symbols_in_excel: str) -> Dict[SocialClass, Pronunciation]:
+    if phoneme_symbols_in_excel == "hNN":
+        return {
+            SocialClass.HEIMIN: Pronunciation(
+                "hnː",
+                ["フンー"],
+            )
+        }
+
+    moras = split_into_moras(phoneme_symbols_in_excel)
+    converted_moras = [mora2kana_n_IPA(m) for m in moras]
+    # print(converted_moras)
+    kanas = [m[0] for m in converted_moras]
+    ipas = [m[1] for m in converted_moras]
+    # print(kanas)
+    # print(ipas)
+    ret_dict = {
+        SocialClass.HEIMIN:
+        Pronunciation(
+            "".join(ipa[0] for ipa in ipas),
+            ["".join(w) for w in product(*[k[0] for k in kanas])],
+        )
+    }
+    if any(len(ipa) > 1 for ipa in ipas):
+        ret_dict.update({
+            SocialClass.SHIZOKU:
+            Pronunciation(
+                "".join(ipa[-1] for ipa in ipas),
+                ["".join(w) for w in product(*[k[-1] for k in kanas])],
+            )
+        })
+    return ret_dict
 
 
 def generate_phonetics(phoneme_symbols_in_excel: str) -> WordPhonetics:
@@ -150,17 +220,12 @@ def generate_phonetics(phoneme_symbols_in_excel: str) -> WordPhonetics:
             phoneme_symbols_in_excel,
             get_original_phonemes(phoneme_symbols_in_excel),
         ),
-        {
-            s_class: get_ipa_n_kana(phoneme_symbols_in_excel, s_class)
-            for s_class in SocialClass
-        },
+        get_ipa_n_kana(phoneme_symbols_in_excel),
     )
 
 
 def convert2kana(pronunciation: str) -> List[str]:
     """発音記号をかな表記に変換します。"""
-    if pronunciation in exceptions:
-        return ["フンー"]
 
     kana_list = []
     for mora in split_into_moras(pronunciation):

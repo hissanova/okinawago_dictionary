@@ -4,11 +4,10 @@ from typing import List
 from csv import DictReader
 from enum import Enum
 from pathlib import Path
-from pprint import pprint
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
-from kanahyouki import convert2kana
+from kanahyouki import generate_phonetics
 from pos import get_pos
 
 
@@ -18,11 +17,17 @@ class Oki2YamatoConverter():
     def convert(tsv_row):
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
-        pronuc = tsv_row["見出し語"]
-        pos = get_pos(tsv_row["品詞"], pronuc)
+        pronunciation = tsv_row["見出し語"]
+        pos = get_pos(tsv_row["品詞"], pronunciation)
         res["pos"] = pos.to_dict()
-        res["pronunciation"] = pronuc
-        res["index"] = convert2kana(pronuc)
+        phonetics = generate_phonetics(pronunciation)
+        phonetics = phonetics.to_dict()
+        res["phonetics"] = phonetics
+        pronunciation = phonetics["pronunciation"]
+        indices = pronunciation["HEIMIN"]["kana"].copy()
+        if indices_ := pronunciation.get("SHIZOKU"):
+            indices += indices_["kana"]
+        res["index"] = indices
         res["accent"] = tsv_row["アクセント型"]
         res["bungo-type"] = tsv_row["文語などの\n種別"]
         res["amendment"] = tsv_row["補足"]
@@ -53,7 +58,7 @@ def _make_oki_item(pronunciation):
     if is_romaji(pronunciation):
         vocabulary.update({
             "pronunciation": pronunciation,
-            "kana": convert2kana(pronunciation),
+            "kana": generate_phonetics(pronunciation)["kana"],
             "lang": "Okinawa"
         })
     else:
@@ -176,6 +181,7 @@ def main():
 
         for i, entry in enumerate(base_tsv):
             new_entry = {"id": i}
+            print(converter.convert(entry))
             new_entry.update(converter.convert(entry))
             entry_list.append(new_entry)
 
