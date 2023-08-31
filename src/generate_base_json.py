@@ -4,6 +4,7 @@ from typing import List
 from csv import DictReader
 from enum import Enum
 from pathlib import Path
+from collections import defaultdict, OrderedDict
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
@@ -14,7 +15,8 @@ from pos import get_pos
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
 
-    def convert(tsv_row):
+    @classmethod
+    def convert(cls, tsv_row):
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
         pronunciation = tsv_row["見出し語"]
@@ -40,34 +42,99 @@ class Oki2YamatoConverter():
 class Yamato2OkiConverter():
     source = "./resources/base_lists/okinawa_02.tsv"
 
-    def convert(tsv_row):
+    @classmethod
+    def convert(cls, tsv_row):
         res = {}
         res["page-in-dict"] = tsv_row["辞書\nページ"]
         res["index"] = [to_hiragana(tsv_row["見出し"])]
         res["kanji"] = tsv_row["見出しの漢字"]
         res["explanation"] = tsv_row["見出しの説明"]
-        res["contents"] = _parse_contents(tsv_row["内容"])
+        res["contents"] = cls._parse_contents(tsv_row["内容"])
         return res
 
+    @classmethod
+    def _make_oki_item(cls, pronunciation):
+        vocabulary = {"reference": False}
+        if pronunciation.startswith("→"):
+            pronunciation = pronunciation[1:]
+            vocabulary["reference"] = True
+        if is_romaji(pronunciation):
+            vocabulary.update({
+                "pronunciation": pronunciation,
+                "kana": generate_phonetics(pronunciation)["kana"],
+                "lang": "Okinawa"
+            })
+        else:
+            vocabulary.update({
+                "pronunciation": None,
+                "kana": pronunciation,
+                "lang": "Yamato"
+            })
+        return vocabulary
 
-def _make_oki_item(pronunciation):
-    vocabulary = {"reference": False}
-    if pronunciation.startswith("→"):
-        pronunciation = pronunciation[1:]
-        vocabulary["reference"] = True
-    if is_romaji(pronunciation):
-        vocabulary.update({
-            "pronunciation": pronunciation,
-            "kana": generate_phonetics(pronunciation)["kana"],
-            "lang": "Okinawa"
-        })
-    else:
-        vocabulary.update({
-            "pronunciation": None,
-            "kana": pronunciation,
-            "lang": "Yamato"
-        })
-    return vocabulary
+    @classmethod
+    def _parse_contents(cls, content_obj):
+        contents_dict = {}
+        translations = content_obj.split('/')
+        base_translations = []
+        for pronunciation in translations.pop(0).strip(".").split('，'):
+            base_translations.append(cls._make_oki_item(pronunciation))
+
+        contents_dict["base"] = base_translations
+        contents_dict["related"] = []
+        for related_str in translations:
+            related_str = related_str.replace(' ', '')
+            related_phrases = cls._split_related_words_str(related_str)
+            related_phrases = cls._flatten_period(related_phrases)
+            contents_dict["related"].append(
+                [cls._make_oki_item(phrase) for phrase in related_phrases])
+        return contents_dict
+
+    @classmethod
+    def _split_related_words_str(cls, related_words: str) -> List[str]:
+        split_word = []
+        current_mode = LangMode.JAP
+        current_chunk = ""
+        while related_words:
+            ch = related_words[0]
+            char_mode = _get_lang_mode(ch)
+            if char_mode == LangMode.PARETH:
+                closing_pos = related_words.index(")") + 1
+                current_chunk += related_words[:closing_pos]
+                related_words = related_words[closing_pos:]
+                continue
+            if char_mode == LangMode.COMMA:
+                if current_mode == LangMode.JAP:
+                    current_chunk += ch
+                else:
+                    if current_chunk:
+                        split_word.append(current_chunk)
+                    current_chunk = ''
+            elif char_mode == LangMode.OTHERS:
+                if current_chunk:
+                    split_word.append(current_chunk)
+                current_chunk = ch
+            else:
+                if current_mode == char_mode:
+                    current_chunk += ch
+                else:
+                    if current_chunk:
+                        if current_chunk != "→":
+                            split_word.append(current_chunk)
+                            current_chunk = ch
+                        else:
+                            current_chunk += ch
+                    else:
+                        current_chunk = ch
+                    current_mode = char_mode
+            related_words = related_words[1:]
+        split_word.append(current_chunk)
+        return split_word
+
+    @classmethod
+    def _flatten_period(cls, target_list):
+        nested_list = [e.split('.') for e in target_list]
+        return [e for sublist in nested_list for e in sublist]
 
 
 class LangMode(Enum):
@@ -91,78 +158,13 @@ def _get_lang_mode(ch: str) -> LangMode:
         return LangMode.OTHERS
 
 
-def _split_related_words_str(related_words: str) -> List[str]:
-    split_word = []
-    current_mode = LangMode.JAP
-    current_chunk = ""
-    while related_words:
-        ch = related_words[0]
-        char_mode = _get_lang_mode(ch)
-        if char_mode == LangMode.PARETH:
-            closing_pos = related_words.index(")") + 1
-            current_chunk += related_words[:closing_pos]
-            related_words = related_words[closing_pos:]
-            continue
-        if char_mode == LangMode.COMMA:
-            if current_mode == LangMode.JAP:
-                current_chunk += ch
-            else:
-                if current_chunk:
-                    split_word.append(current_chunk)
-                current_chunk = ''
-        elif char_mode == LangMode.OTHERS:
-            if current_chunk:
-                split_word.append(current_chunk)
-            current_chunk = ch
-        else:
-            if current_mode == char_mode:
-                current_chunk += ch
-            else:
-                if current_chunk:
-                    if current_chunk != "→":
-                        split_word.append(current_chunk)
-                        current_chunk = ch
-                    else:
-                        current_chunk += ch
-                else:
-                    current_chunk = ch
-                current_mode = char_mode
-        related_words = related_words[1:]
-    split_word.append(current_chunk)
-    return split_word
-
-
-def flatten_period(target_list):
-    nested_list = [e.split('.') for e in target_list]
-    return [e for sublist in nested_list for e in sublist]
-
-
-def _parse_contents(content_obj):
-    contents_dict = {}
-    translations = content_obj.split('/')
-    base_translations = []
-    for pronunciation in translations.pop(0).strip(".").split('，'):
-        base_translations.append(_make_oki_item(pronunciation))
-
-    contents_dict["base"] = base_translations
-    contents_dict["related"] = []
-    for related_str in translations:
-        related_str = related_str.replace(' ', '')
-        related_phrases = _split_related_words_str(related_str)
-        related_phrases = flatten_period(related_phrases)
-        contents_dict["related"].append(
-            [_make_oki_item(phrase) for phrase in related_phrases])
-    return contents_dict
-
-
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        'dict_type',
-        choices=['o2y', 'y2o'],
-        help=
-        "o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\ny2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)"
-    )
+    parser.add_argument('dict_type',
+                        choices=['o2y', 'y2o'],
+                        help="""
+        o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\ny2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)"""
+                        )
     return parser.parse_args()
 
 
@@ -173,20 +175,35 @@ def main():
     args = parse_args()
     converter = converter_dict[args.dict_type]
     entry_list = []
-    filename = Path(converter.source).name.replace(".tsv", ".json")
-    new_path = Path(__file__).parent / "okinawago_dictionary" / filename
+    target_dir = Path(__file__).parent / "okinawago_dictionary"
+    new_path = target_dir / Path(converter.source).name.replace(
+        ".tsv", ".json")
+    index_table_path = target_dir / Path(converter.source).name.replace(
+        ".tsv", "_index-table.json")
 
     with open(converter.source, 'r') as base_file:
         base_tsv = DictReader(base_file, delimiter='\t')
 
         for i, entry in enumerate(base_tsv):
             new_entry = {"id": i}
-            print(converter.convert(entry))
+            # print(converter.convert(entry))
             new_entry.update(converter.convert(entry))
             entry_list.append(new_entry)
 
     with open(new_path, 'w') as base_json:
         json.dump(entry_list, base_json, ensure_ascii=False)
+
+    index2id_table = defaultdict(list)
+    for entry in entry_list:
+        word_id = entry["id"]
+        indices = entry["index"]
+        for index in indices:
+            index2id_table[index] += [word_id]
+
+    with open(index_table_path, 'w') as table_json_path:
+        json.dump(OrderedDict(index2id_table),
+                  table_json_path,
+                  ensure_ascii=False)
 
 
 if __name__ == "__main__":
