@@ -8,7 +8,7 @@ word::=mora+...
 - v:semi-vowel
 - V:vowel
 """
-from typing import Dict, List, NamedTuple, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple
 from enum import Enum
 import json
 from itertools import product
@@ -107,6 +107,10 @@ def split_into_moras(pronunciation: str) -> List[str]:
 
 
 class PhonemeSymols(NamedTuple):
+    """
+    simplified: excel ファイルに格納されていた音素記号
+    original: 元の辞書に記載されていた音素記号
+    """
     simplified: str
     original: str
 
@@ -115,6 +119,8 @@ class PhonemeSymols(NamedTuple):
 
 
 class Pronunciation(NamedTuple):
+    """IPA はただ１つ定まり。それに対応するカナ表記は、リストの要素数分だけバリエーションがあります。
+    """
     ipa: str
     kana: List[str]
 
@@ -128,6 +134,10 @@ class SocialClass(Enum):
 
 
 class WordPhonetics(NamedTuple):
+    """音素とそれに対応する音声(IPA,カナ)を格納します。
+    音声は、氏族発音がある時のみ pronunciations にキー"SHIZOKU"に格納されます。
+    それ以外はすべて、"HEIMIN" キーに格納されます。
+    """
     phonemes: PhonemeSymols
     pronunciations: Dict[SocialClass, Pronunciation]
 
@@ -164,7 +174,53 @@ def _add_char_to_all(word_list: List[str], char: str) -> List[str]:
     return [word + char for word in word_list]
 
 
+def scroll_list(list_: List[Any]) -> List[List[Any]]:
+    """ [e0, e1, e2..., en] -> [[e0, e1], [e1, e2],...,[e_n, None]]
+    """
+    return [
+        list_[i:i + 2] if len(list_[i:i + 2]) == 2 else [list_[i], None]
+        for i in range(len(list_))
+    ]
+
+
+def _sokuon_n_hatsuon_to_ipa(
+        ipa_syllables: List[List[str]]) -> List[List[str]]:
+    """
+    促音 /Q/ と 撥音 /N/ の実際の音声は、その後に来る子音によって変わるので後ろの子音で、条件分岐処理する。
+    """
+    new_ipa_syllables = []
+    new_syllable = [""]
+    for syllable1, syllable2 in scroll_list(ipa_syllables):
+        if syllable1 == ["N"]:
+            if syllable2 is None:
+                new_syllable = ["\u0274"]  # IPA 口蓋垂鼻音 "ɴ"
+            elif syllable2[0][0] in ["m", "p", "b"]:
+                new_syllable = ["m"]
+            elif syllable2[0][0] in ["k", "ɡ"]:
+                new_syllable = ["ŋ"]
+            else:
+                new_syllable = ["n"]
+        elif syllable1 == ["Q"]:
+            if syllable2 is not None:
+                new_syllable = [s[0] for s in syllable2]
+            else:
+                new_syllable = [""]
+        else:
+            new_syllable = syllable1
+        new_ipa_syllables.append(new_syllable)
+
+    return new_ipa_syllables
+
+
 def mora2kana_n_IPA(mora: str) -> Tuple[List[List[str]], List[str]]:
+    """
+    Args:
+    mora: シラブル
+    Return:
+    ([["ヘイミン１", "ヘイミン２"],
+       ["シゾク１", "シゾク2"]],
+     ["heimin", "shizoku"])
+    """
     long_vowel_sym = ["", ""]
     if _contain_long_vowel(mora):
         mora = mora[:-1]
@@ -191,9 +247,9 @@ def get_ipa_n_kana(
 
     moras = split_into_moras(phoneme_symbols_in_excel)
     converted_moras = [mora2kana_n_IPA(m) for m in moras]
-    # print(converted_moras)
     kanas = [m[0] for m in converted_moras]
     ipas = [m[1] for m in converted_moras]
+    ipas = _sokuon_n_hatsuon_to_ipa(ipas)
     # print(kanas)
     # print(ipas)
     ret_dict = {
