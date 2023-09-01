@@ -5,6 +5,7 @@ from csv import DictReader
 from enum import Enum
 from pathlib import Path
 from collections import defaultdict, OrderedDict
+import re
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
@@ -53,23 +54,27 @@ class Yamato2OkiConverter():
         return res
 
     @classmethod
-    def _make_oki_item(cls, pronunciation):
+    def _make_oki_item(cls, item_symbols):
+        item_symbols = item_symbols.replace(" ", "")
         vocabulary = {"reference": False}
-        if pronunciation.startswith("→"):
-            pronunciation = pronunciation[1:]
+        # 関連フレーズ: "(敬語|小児語|卑語|時刻|植物名)\w+" の形のもの
+        if m := re.match(r"\((\w+)\)([\w→'?-]+)", item_symbols):
+            connotation, item_symbols = m.groups()
+            vocabulary.update({"connotation": connotation})
+        if "(" in item_symbols:
+            print(item_symbols)
+        if item_symbols.startswith("→"):
+            item_symbols = item_symbols[1:]
             vocabulary["reference"] = True
-        if is_romaji(pronunciation):
+        if is_romaji(item_symbols):
             vocabulary.update({
-                "pronunciation": pronunciation,
-                "kana": generate_phonetics(pronunciation)["kana"],
-                "lang": "Okinawa"
+                "lang":
+                "Okinawa",
+                "phonetics":
+                generate_phonetics(item_symbols).to_dict()
             })
         else:
-            vocabulary.update({
-                "pronunciation": None,
-                "kana": pronunciation,
-                "lang": "Yamato"
-            })
+            vocabulary.update({"lang": "Yamato", "kana": item_symbols})
         return vocabulary
 
     @classmethod
