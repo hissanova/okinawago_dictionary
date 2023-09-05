@@ -1,8 +1,6 @@
 import json
 from itertools import product
 
-from wanakana import to_katakana
-
 with open("resources/roman-to-ipa-dict.json") as fp:
     roman_ipa_dict = json.load(fp)
 

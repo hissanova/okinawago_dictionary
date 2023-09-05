@@ -108,9 +108,9 @@ class Yamato2OkiConverter():
                         vocabulary.update({"related": related_okinawans_list})
         else:
             vocabulary.update({"lang": "Yamato", "kana": item_symbols})
-        if "(" in item_symbols:
-            print(item_symbols)
-            print(vocabulary)
+        # if "(" in item_symbols:
+        #     print(item_symbols)
+        #     print(vocabulary)
 
         return vocabulary
 
@@ -135,7 +135,7 @@ class Yamato2OkiConverter():
     @classmethod
     def _split_related_words_str(cls, related_words: str) -> List[str]:
         """
-        
+        WIP:正規表現に書き換える
         """
         split_word = []
         current_mode = LangMode.JAP
