@@ -3,6 +3,10 @@ from collections import Counter, defaultdict
 import json
 import re
 from typing import Dict, List, Sequence
+from pathlib import Path
+from utils import create_index2id_table
+
+from wanakana import to_katakana
 
 # regex で \w と見做されない unicode 文字リスト
 non_alnum_chs = [
@@ -88,10 +92,13 @@ def parse_args():
     return parser.parse_args()
 
 
+current_dir = Path(__file__).parent
+
+
 def main():
     args = parse_args()
     items = []
-    with open("dict_items.jsonl", 'r') as fp:
+    with open(current_dir / "dict_items.jsonl", 'r') as fp:
         for line in fp:
             items.append(json.loads(line))
     index_pos_stats: Dict[int, Counter] = defaultdict(Counter)
@@ -171,14 +178,23 @@ def main():
     # print(ch_sets[0])
     # print(ch_sets[1])
     file_format = args.format
+    target_dir = current_dir / "../okinawago_dictionary"
     if file_format == "jsonl":
-        with open("katsuyou_jiten.jsonl", "w") as fp:
+        with open(target_dir / "katsuyou_jiten.jsonl", "w") as fp:
             for dict_item in dictionary:
                 json.dump(dict_item, fp, ensure_ascii=False)
                 fp.write("\n")
     elif file_format == "json":
-        with open("katsuyou_jiten.json", "w") as fp:
+        with open(target_dir / "katsuyou_jiten.json", "w") as fp:
             json.dump(dictionary, fp, ensure_ascii=False)
+        with open(target_dir / "katsuyou_jiten_index-table.json", "w") as fp:
+            json.dump(
+                {
+                    to_katakana(k): v
+                    for k, v in create_index2id_table(dictionary).items()
+                },
+                fp,
+                ensure_ascii=False)
 
     # print(all(item["yamato"].count("〈") == 1 for item in dictionary))
     # print(all(item["yamato"].endswith("〉") for item in dictionary))

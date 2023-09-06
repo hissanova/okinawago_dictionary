@@ -4,17 +4,33 @@ from typing import List
 from csv import DictReader
 from enum import Enum
 from pathlib import Path
-from collections import defaultdict, OrderedDict
 import re
 
 from wanakana import is_char_en_num, is_japanese, is_romaji, to_hiragana
 
+from utils import create_index2id_table
 from kanahyouki import generate_phonetics, SocialClass
 from pos import get_pos
+
+unicode_ranges = {
+    "hiragana": "\u3041-\u3096",
+    "katakana": "\u30A0-\u30FF",
+    "kanji": "\u3400-\u4DB5\u4E00-\u9FCB\uF900-\uFA6A",
+    "kanji_radicals": "\u2E80-\u2FD5",
+    "hankaku_katakana": "\uFF5F-\uFF9F",
+    "punctuations": "\u3000-\u303F",
+    "zenkaku_alphanum_puncs": "\uFF01-\uFF5E",
+    "misc": "\u31F0-\u31FF\u3220-\u3243\u3280-\u337F",
+}
+
+total_uni_ranges = "".join([r for r in unicode_ranges.values()])
 
 
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
+    # oki_dict meaning string のパース用regex
+    okinawan_in_sentence_pattern = re.compile(r"([-～a-zA-Z?\s']+)")
+    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]+\.)")
 
     @classmethod
     def convert(cls, tsv_row):
@@ -238,15 +254,8 @@ def main():
     with open(new_path, 'w') as base_json:
         json.dump(entry_list, base_json, ensure_ascii=False)
 
-    index2id_table = defaultdict(list)
-    for entry in entry_list:
-        word_id = entry["id"]
-        indices = entry["index"]
-        for index in indices:
-            index2id_table[index] += [word_id]
-
     with open(index_table_path, 'w') as table_json_path:
-        json.dump(OrderedDict(index2id_table),
+        json.dump(create_index2id_table(entry_list),
                   table_json_path,
                   ensure_ascii=False)
 
