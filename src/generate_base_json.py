@@ -23,13 +23,13 @@ unicode_ranges = {
 }
 
 total_uni_ranges = "".join([r for r in unicode_ranges.values()])
-# oki_dict meaning string のパース用regex
-okinawan_in_sentence_pattern = re.compile(r"([-～a-zA-Z?\s']+)")
-example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]+\.)")
 
 
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
+    # meaning string のパース用regex
+    okinawan_in_sentence_pattern = re.compile(r"([-～a-zA-Z?\s']+)")
+    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]+\.)")
 
     @classmethod
     def convert(cls, tsv_row):
@@ -56,10 +56,10 @@ class Oki2YamatoConverter():
 
     @classmethod
     def _parse_meaning_string(cls, sentence: str):
-        split_s = example_sentences_pattern.split(sentence)
+        split_s = cls.example_sentences_pattern.split(sentence)
         main_body = {
             "sentence": split_s[0],
-            "okinawago": okinawan_in_sentence_pattern.findall(split_s[0])
+            "okinawago": cls.okinawan_in_sentence_pattern.findall(split_s[0])
         }
         example_sentences = []
         examples = split_s[1:]
@@ -78,6 +78,7 @@ class Oki2YamatoConverter():
 
 class Yamato2OkiConverter():
     source = "./resources/base_lists/okinawa_02.tsv"
+    okinawan_in_related_words = re.compile(r"((?:\(\w+\))?→?[-a-zA-Z?\s']+)")
 
     @classmethod
     def convert(cls, tsv_row):
@@ -110,9 +111,7 @@ class Yamato2OkiConverter():
 
     @classmethod
     def _split_related_words_str(cls, related_str: str) -> List[str]:
-        okinawan_in_related_words = re.compile(
-            r"((?:\(\w+\))?→?[-a-zA-Z?\s']+)")
-        split_str = okinawan_in_related_words.split(related_str)
+        split_str = cls.okinawan_in_related_words.split(related_str)
         split_str = [s for s in split_str if re.match(r"[^，.]", s)]
         return split_str
 
@@ -120,9 +119,7 @@ class Yamato2OkiConverter():
     def _make_oki_item(cls, item_symbols):
         item_symbols = item_symbols.replace(" ", "")
         vocabulary = {"reference": False}
-        oki_vocab = {
-            "lang": "Okinawa",
-        }
+        oki_vocab = {"lang": "Okinawa"}
         if item_symbols.startswith("→"):
             item_symbols = item_symbols[1:]
             vocabulary["reference"] = True
@@ -167,9 +164,6 @@ class Yamato2OkiConverter():
                         vocabulary.update({"related": related_okinawans_list})
         else:
             vocabulary.update({"lang": "Yamato", "kana": item_symbols})
-        # if "(" in item_symbols:
-        #     print(item_symbols)
-        #     print(vocabulary)
 
         return vocabulary
 
@@ -184,8 +178,8 @@ def parse_args():
     parser.add_argument('dict_type',
                         choices=['o2y', 'y2o'],
                         help="""
-        o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\ny2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)"""
-                        )
+        o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\n
+        y2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)""")
     return parser.parse_args()
 
 
@@ -199,7 +193,6 @@ def load_n_convert(converter):
 
         for i, entry in enumerate(base_tsv):
             new_entry = {"id": i}
-            # print(converter.convert(entry))
             new_entry.update(converter.convert(entry))
             entry_list.append(new_entry)
     return entry_list
