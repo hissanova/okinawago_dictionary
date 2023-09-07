@@ -8,7 +8,7 @@ import re
 from wanakana import is_romaji, to_hiragana
 
 from utils import create_index2id_table
-from kanahyouki import generate_phonetics, SocialClass
+from kanahyouki import generate_phonetics, WordPhonetics, PhonemeSymols, Pronunciation, SocialClass
 from pos import get_pos
 
 unicode_ranges = {
@@ -50,25 +50,68 @@ class Oki2YamatoConverter():
         res["bungo-type"] = tsv_row["文語などの\n種別"]
         res["amendment"] = tsv_row["補足"]
         keys = ['意味 1.', '意味 2.', '意味 3.', '意味 4.', '意味 5.']
-        res["meaning"] = [tsv_row[key] for key in keys]
+        print(res)
+        res["meaning"] = [
+            cls._parse_meaning_string(tsv_row[key]) for key in keys
+        ]
         res["remarks"] = tsv_row["備考"]
         return res
 
     @classmethod
+    def _join_phonetics_sentence(cls, phonetics_list):
+        joined = WordPhonetics(PhonemeSymols("", ""),
+                               {SocialClass.HEIMIN: Pronunciation("", [""])})
+        for maybe_phonetics in phonetics_list:
+            if not isinstance(maybe_phonetics, WordPhonetics):
+                new_phonetics = WordPhonetics(
+                    PhonemeSymols(maybe_phonetics, maybe_phonetics), {
+                        SocialClass.HEIMIN:
+                        Pronunciation(maybe_phonetics, [maybe_phonetics])
+                    })
+            else:
+                new_phonetics = maybe_phonetics
+            joined += new_phonetics
+        return joined
+
+    @classmethod
+    def _oki_sentence2kana(cls, sentence: str) -> str:
+        oki_word_in_sentence_pattern = re.compile(r"([a-zA-Z?']+)")
+        split_sen = oki_word_in_sentence_pattern.split(sentence)
+        # print("oki_sentence: ", split_sen)
+        kana_sentence = []
+        for word in split_sen:
+            if word and oki_word_in_sentence_pattern.match(word):
+                word = generate_phonetics(word)
+            kana_sentence.append(word)
+        # print(kana_sentence)
+        return cls._join_phonetics_sentence(kana_sentence)
+
+    @classmethod
     def _parse_meaning_string(cls, sentence: str):
+        print("Original: ", sentence)
         split_s = cls.example_sentences_pattern.split(sentence)
-        main_body = {
-            "sentence": split_s[0],
-            "okinawago": cls.okinawan_in_sentence_pattern.findall(split_s[0])
-        }
+        sentence = split_s[0]
+        print("split_s: ", split_s)
+        found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
+        print("found_okis: ", found_okis)
+        okinawago = [
+            cls._oki_sentence2kana(phoneme) for phoneme in found_okis
+            if phoneme not in ["?", "T"]
+        ]
+        print(okinawago)
+        main_body = {"sentence": sentence, "okinawago": okinawago}
         example_sentences = []
         examples = split_s[1:]
         if examples:
             for i in range(0, len(examples), 2):
+                print(examples[i])
                 example_sentences.append({
-                    "okinawa": examples[i],
-                    "yamato": examples[i + 1]
+                    "okinawa":
+                    cls._oki_sentence2kana(examples[i]),
+                    "yamato":
+                    examples[i + 1]
                 })
+        # print(example_sentences)
         return {"body": main_body, "examples": example_sentences}
 
     @classmethod

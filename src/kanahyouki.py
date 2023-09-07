@@ -12,6 +12,8 @@ from typing import Any, Dict, List, NamedTuple, Tuple
 from enum import Enum
 import json
 from itertools import product
+from operator import itemgetter
+from pprint import pprint
 
 vowels = {'a', 'i', 'u', 'e', 'o'}
 consonants = {
@@ -117,6 +119,10 @@ class PhonemeSymols(NamedTuple):
     def to_dict(self):
         return {"simplified": self.simplified, "original": self.original}
 
+    def __add__(self, other):
+        return PhonemeSymols(self.simplified + other.simplified,
+                             self.original + other.original)
+
 
 class Pronunciation(NamedTuple):
     """IPA はただ１つ定まり。それに対応するカナ表記は、リストの要素数分だけバリエーションがあります。
@@ -126,6 +132,10 @@ class Pronunciation(NamedTuple):
 
     def to_dict(self):
         return {"IPA": self.ipa, "kana": self.kana}
+
+    def __add__(self, other):
+        return Pronunciation(self.ipa + other.ipa,
+                             [self.kana[0] + other.kana[0]])
 
 
 class SocialClass(Enum):
@@ -149,6 +159,39 @@ class WordPhonetics(NamedTuple):
                 for s_class, pronunc in self.pronunciations.items()
             }
         }
+
+    def __add__(self, other):
+        new_pronunciations_list = [
+            list(self.pronunciations.copy().items()),
+            list(other.pronunciations.copy().items())
+        ]
+        if max(*[len(items) for items in new_pronunciations_list]) == 2:
+            new_pronunciations_list = [
+                sorted(p, key=lambda e: e[0].value) if len(p) == 2 else 2 * p
+                for p in new_pronunciations_list
+            ]
+            new_pronunciations_dict = {
+                SocialClass.HEIMIN: Pronunciation("", [""]),
+                SocialClass.SHIZOKU: Pronunciation("", [""])
+            }
+            # pprint(new_pronunciations_list)
+            # pprint(new_pronunciations_dict)
+            for pronunciations in new_pronunciations_list:
+                new_pronunciations_dict[
+                    SocialClass.HEIMIN] += pronunciations[0][1]
+            for pronunciations in new_pronunciations_list:
+                new_pronunciations_dict[
+                    SocialClass.SHIZOKU] += pronunciations[1][1]
+        else:
+            # pprint(new_pronunciations_list)
+            new_pronunciations_dict = {
+                SocialClass.HEIMIN:
+                new_pronunciations_list[0][0][1] +
+                new_pronunciations_list[1][0][1],
+            }
+            # pprint(new_pronunciations_dict)
+        return WordPhonetics(self.phonemes + other.phonemes,
+                             new_pronunciations_dict)
 
 
 excel2Original_dict = {
