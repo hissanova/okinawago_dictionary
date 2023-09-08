@@ -4,6 +4,7 @@ from typing import List
 from csv import DictReader
 from pathlib import Path
 import re
+from pprint import pprint
 
 from wanakana import is_romaji, to_hiragana
 
@@ -27,9 +28,11 @@ total_uni_ranges = "".join([r for r in unicode_ranges.values()])
 
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
-    # meaning string のパース用regex
-    okinawan_in_sentence_pattern = re.compile(r"([-～a-zA-Z?\s']+)")
-    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]+\.)")
+    # meaning string のパース用regex.
+    # okinawan_in_sentence_pattern は、e.g.〔?i~i~Ci~i~〕のパターン(IPA&鼻音あり)を除く
+    okinawan_in_sentence_pattern = re.compile(r"((?<!〔)[-～a-zA-Z?\s']+(?!~))")
+    ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']+)〕")
+    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]{2,}\.)")
 
     @classmethod
     def convert(cls, tsv_row):
@@ -53,6 +56,7 @@ class Oki2YamatoConverter():
         print(res)
         res["meaning"] = [
             cls._parse_meaning_string(tsv_row[key]) for key in keys
+            if tsv_row[key]
         ]
         res["remarks"] = tsv_row["備考"]
         return res
@@ -71,7 +75,7 @@ class Oki2YamatoConverter():
             else:
                 new_phonetics = maybe_phonetics
             joined += new_phonetics
-        return joined
+        return joined.to_dict()
 
     @classmethod
     def _oki_sentence2kana(cls, sentence: str) -> str:
@@ -87,32 +91,46 @@ class Oki2YamatoConverter():
         return cls._join_phonetics_sentence(kana_sentence)
 
     @classmethod
+    def _kanafy_okinawan_in_yamato(cls, sentence: str):
+        found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
+        ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
+        if ipa_in_sentence:
+            print("IPA:", ipa_in_sentence)
+        return [
+            cls._oki_sentence2kana(phoneme)
+            for phoneme in found_okis if not re.fullmatch(
+                r"([a-zA-Z?\s～]\.?|-self|apocopated\s?form)", phoneme)
+        ]
+
+    @classmethod
     def _parse_meaning_string(cls, sentence: str):
+        paragraphs = []
         print("Original: ", sentence)
         split_s = cls.example_sentences_pattern.split(sentence)
         sentence = split_s[0]
-        print("split_s: ", split_s)
-        found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
-        print("found_okis: ", found_okis)
-        okinawago = [
-            cls._oki_sentence2kana(phoneme) for phoneme in found_okis
-            if phoneme not in ["?", "T"]
-        ]
-        print(okinawago)
-        main_body = {"sentence": sentence, "okinawago": okinawago}
-        example_sentences = []
-        examples = split_s[1:]
-        if examples:
-            for i in range(0, len(examples), 2):
-                print(examples[i])
-                example_sentences.append({
-                    "okinawa":
-                    cls._oki_sentence2kana(examples[i]),
-                    "yamato":
-                    examples[i + 1]
-                })
-        # print(example_sentences)
-        return {"body": main_body, "examples": example_sentences}
+        okinawago = cls._kanafy_okinawan_in_yamato(sentence)
+        pprint("SPLIT_S: ")
+        pprint(split_s)
+        pprint("OKINAWAGO:")
+        pprint(okinawago)
+        first_paragraph = {"yamato": sentence}
+        if okinawago:
+            first_paragraph.update({"okinawago": okinawago})
+        paragraphs.append(first_paragraph)
+        remains = split_s[1:]
+        if remains:
+            for i in range(0, len(remains), 2):
+                print(remains[i])
+                paragraphs.append(
+                    {"example": cls._oki_sentence2kana(remains[i])})
+                yamato_para = {"yamato": remains[i + 1]}
+                okinawago = cls._kanafy_okinawan_in_yamato(remains[i + 1])
+                if okinawago:
+                    yamato_para.update({"okinawago": okinawago})
+                paragraphs.append(yamato_para)
+        print("PARAGRAPHS:")
+        pprint(paragraphs)
+        return paragraphs
 
     @classmethod
     def _convert_oki_sentence2kana(cls, sentence: str):
