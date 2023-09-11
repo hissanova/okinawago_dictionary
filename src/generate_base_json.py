@@ -105,14 +105,14 @@ class Oki2YamatoConverter():
     @classmethod
     def _parse_meaning_string(cls, sentence: str):
         paragraphs = []
-        print("Original: ", sentence)
+        # print("Original: ", sentence)
         split_s = cls.example_sentences_pattern.split(sentence)
         sentence = split_s[0]
         okinawago = cls._kanafy_okinawan_in_yamato(sentence)
-        pprint("SPLIT_S: ")
-        pprint(split_s)
-        pprint("OKINAWAGO:")
-        pprint(okinawago)
+        # pprint("SPLIT_S: ")
+        # pprint(split_s)
+        # pprint("OKINAWAGO:")
+        # pprint(okinawago)
         first_paragraph = {"yamato": sentence}
         if okinawago:
             first_paragraph.update({"okinawago": okinawago})
@@ -120,16 +120,16 @@ class Oki2YamatoConverter():
         remains = split_s[1:]
         if remains:
             for i in range(0, len(remains), 2):
-                print(remains[i])
+                # print(remains[i])
                 paragraphs.append(
-                    {"example": cls._oki_sentence2kana(remains[i])})
+                    {"okinawago": cls._oki_sentence2kana(remains[i])})
                 yamato_para = {"yamato": remains[i + 1]}
                 okinawago = cls._kanafy_okinawan_in_yamato(remains[i + 1])
                 if okinawago:
                     yamato_para.update({"okinawago": okinawago})
                 paragraphs.append(yamato_para)
-        print("PARAGRAPHS:")
-        pprint(paragraphs)
+        # print("PARAGRAPHS:")
+        # pprint(paragraphs)
         return paragraphs
 
     @classmethod
@@ -139,7 +139,8 @@ class Oki2YamatoConverter():
 
 class Yamato2OkiConverter():
     source = "./resources/base_lists/okinawa_02.tsv"
-    okinawan_in_related_words = re.compile(r"((?:\(\w+\))?→?[-a-zA-Z?\s']+)")
+    okinawan_in_related_words = re.compile(
+        r"((?:\([\w，'?\s]+\))?→?[-a-zA-Z?\s']+(?:\([\w，'?\s]+\))*)")
 
     @classmethod
     def convert(cls, tsv_row):
@@ -153,7 +154,7 @@ class Yamato2OkiConverter():
 
     @classmethod
     def _parse_contents(cls, content_obj):
-        print(content_obj)
+        # pprint(content_obj)
         contents_dict = {}
         translations = content_obj.split('/')
         base_translations = []
@@ -163,9 +164,8 @@ class Yamato2OkiConverter():
         contents_dict["base"] = base_translations
         contents_dict["related"] = []
         for related_str in translations:
-            related_str = related_str.replace(' ', '')
+            related_str = related_str.replace(' ', '').replace('　', '')
             related_phrases = cls._split_related_words_str(related_str)
-            print(related_phrases)
             contents_dict["related"].append(
                 [cls._make_oki_item(phrase) for phrase in related_phrases])
         return contents_dict
@@ -179,50 +179,59 @@ class Yamato2OkiConverter():
     @classmethod
     def _make_oki_item(cls, item_symbols):
         item_symbols = item_symbols.replace(" ", "")
-        vocabulary = {"reference": False}
-        oki_vocab = {"lang": "Okinawa"}
+        vocabulary = {"reference": False, "lang": "Okinawa"}
         if item_symbols.startswith("→"):
             item_symbols = item_symbols[1:]
             vocabulary["reference"] = True
         if is_romaji(item_symbols):
             vocabulary.update(
-                oki_vocab,
-                **{"phonetics": generate_phonetics(item_symbols).to_dict()})
+                {"phonetics": generate_phonetics(item_symbols).to_dict()})
         # 関連フレーズ: "(敬語|小児語|卑語|時刻|植物名)\w+" の形のもの
         elif m := re.match(r"\((\w+)\)([\w→'?-]+)", item_symbols):
             connotation, item_symbols = m.groups()
-            vocabulary.update({"connotation": connotation})
+            if item_symbols.startswith("→"):
+                vocabulary["reference"] = True
+                item_symbols = item_symbols[1:]
+            if is_romaji(item_symbols):
+                vocabulary.update({
+                    "phonetics":
+                    generate_phonetics(item_symbols).to_dict(),
+                    "connotation":
+                    connotation
+                })
+            else:
+                vocabulary["lang"] = "Yamato"
+                vocabulary["kana"] = item_symbols
         elif m := re.match(r"([a-zA-Z'?-]+)\(([\w，' ]+)\)\(?([\w，' ]*)\)?",
                            item_symbols):
             m_groups = m.groups()
             vocabulary.update(
-                oki_vocab,
-                **{"phonetics": generate_phonetics(m_groups[0]).to_dict()})
+                {"phonetics": generate_phonetics(m_groups[0]).to_dict()})
             rest = m_groups[1:]
+            related_okinawans_list = []
             for related in rest:
                 if related:
                     if m_ := re.match(r"(敬語)([\w'，]+)", related):
-                        vocabulary.update({
-                            "related":
-                            oki_vocab.update({
-                                "phonetics":
-                                generate_phonetics(m_.groups()[1]).to_dict(),
-                                "connotation":
-                                "敬語"
-                            })
+                        related_okinawans_list.append({
+                            "lang":
+                            "Okinawa",
+                            "phonetics":
+                            generate_phonetics(m_.groups()[1]).to_dict(),
+                            "connotation":
+                            "敬語"
                         })
-                    elif m_ := re.match(r"([\w']+)(の種類)([\w'，]+)", related):
+                    elif m_ := re.match(r"([\w']+)\s*(の種類)\s*([\w'，]+)",
+                                        related):
                         m_groups = m_.groups()
                         related_okinawans = m_groups[2]
-                        related_okinawans_list = [
+                        related_okinawans_list.append(
                             cls._make_oki_item(
                                 generate_phonetics(m_groups[0]).pronunciations[
-                                    SocialClass.HEIMIN].kana[0] + "の種類")
-                        ]
+                                    SocialClass.HEIMIN].kana[0] + "の種類"))
                         for related_okinawan in related_okinawans.split("，"):
                             related_okinawans_list.append(
                                 cls._make_oki_item(related_okinawan))
-                        vocabulary.update({"related": related_okinawans_list})
+            vocabulary.update({"related": related_okinawans_list})
         else:
             vocabulary.update({"lang": "Yamato", "kana": item_symbols})
 

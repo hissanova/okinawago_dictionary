@@ -12,8 +12,8 @@ from typing import Any, Dict, List, NamedTuple, Tuple
 from enum import Enum
 import json
 from itertools import product
-from operator import itemgetter
-from pprint import pprint
+from collections import defaultdict
+# from pprint import pprint
 
 vowels = {'a', 'i', 'u', 'e', 'o'}
 consonants = {
@@ -278,6 +278,21 @@ def mora2kana_n_IPA(mora: str) -> Tuple[List[List[str]], List[str]]:
     )
 
 
+def _kana_combinations(kana_list: List[List[str]]) -> List[str]:
+    c2pos_dict: Dict[Tuple[str, ...], List[int]] = defaultdict(list)
+    for i, c in enumerate(kana_list):
+        c2pos_dict[tuple(c)] += [i]
+    kana_combs = []
+    for c_comb in product(*c2pos_dict.keys()):
+        new_s: List[str] = ["" for _ in range(len(kana_list))]
+        for c, pos in zip(c_comb, list(c2pos_dict.values())):
+            for p in pos:
+                new_s[p] = c  # type: ignore
+        kana_combs.append("".join(new_s))
+        # print(new_s)
+    return kana_combs
+
+
 def get_ipa_n_kana(
         phoneme_symbols_in_excel: str) -> Dict[SocialClass, Pronunciation]:
     if phoneme_symbols_in_excel == "hNN":
@@ -295,19 +310,21 @@ def get_ipa_n_kana(
     ipas = _sokuon_n_hatsuon_to_ipa(ipas)
     # print(kanas)
     # print(ipas)
+    kana_combs = _kana_combinations([k[0] for k in kanas])
     ret_dict = {
         SocialClass.HEIMIN:
         Pronunciation(
             "".join(ipa[0] for ipa in ipas),
-            ["".join(w) for w in product(*[k[0] for k in kanas])],
+            kana_combs,
         )
     }
     if any(len(ipa) > 1 for ipa in ipas):
+        kana_combs = _kana_combinations([k[-1] for k in kanas])
         ret_dict.update({
             SocialClass.SHIZOKU:
             Pronunciation(
                 "".join(ipa[-1] for ipa in ipas),
-                ["".join(w) for w in product(*[k[-1] for k in kanas])],
+                kana_combs,
             )
         })
     return ret_dict
