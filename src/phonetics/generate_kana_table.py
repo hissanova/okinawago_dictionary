@@ -27,10 +27,6 @@ def excel2original(excel_str: str) -> str:
     return excel_str
 
 
-consonant2syllables_dict: Dict[str, OrderedDict] = defaultdict(
-    lambda: OrderedDict([(v, {}) for v in "aiueo-"]))
-
-
 def separate_vowel(syllable: str) -> Tuple[str, str]:
     phonemes = re.split(vowels, syllable)
     if len(phonemes) == 1:
@@ -55,6 +51,17 @@ def merge_dict(d1, d2):
     new_d["kana"] = kana
     return new_d
 
+
+consonant2syllables_dict: Dict[str, OrderedDict] = defaultdict(
+    lambda: OrderedDict([(v, {
+        "roman": [],
+        "IPA": {
+            "HEIMIN": ""
+        },
+        "kana": {
+            "HEIMIN": []
+        },
+    }) for v in "aiueo-"]))
 
 for phonetics_entry in phonetics_table:
     # print(phonetics_entry)
@@ -86,28 +93,63 @@ for phonetics_entry in phonetics_table:
 #     print(k, len(v))
 #     print(v)
 
-# with open("resources/phonetics-table.html", 'w') as fp:
-#     fp.write(json2html.json2html.convert(consonant2syllables_dict))
 # print(dict(consonant2syllables_dict))
-df = pd.DataFrame.from_dict(consonant2syllables_dict)
-df = df.transpose()
-# print(df.values[:2, :])
-print([list(item.values()) for item in df.iloc[0].values])
-row = pd.DataFrame.from_dict(
-    dict(df.iloc[0]),
-    orient="index",
-    columns=["roman", "IPA", "kana"],
-).transpose()
-print(row)
-df.iloc[0] = row
-print(df)
-# print(
-#     df.apply(lambda row: pd.DataFrame.from_dict(
-#         dict(row),
-#         orient="index",
-#         columns=["roman", "IPA", "kana"],
-#     ).transpose(),
-#              axis=1))
+frames = []
+for consonant, row in consonant2syllables_dict.items():
+    index = pd.MultiIndex.from_tuples([
+        (consonant, "音素"),
+        (consonant, "IPA"),
+        (consonant, "カナ"),
+    ])
+    row_list = []
+    for vowel, element in row.items():
+        vals = []
+        for key in ["roman", "IPA", "kana"]:
+            val = element[key]
+            if key == "roman":
+                vals.append("/".join(val))
+            elif key == "IPA":
+                st = "<br>".join(
+                    list(map(lambda i: "".join([i[0], i[1]]), val.items())))
+                st = st.replace("HEIMIN", "").replace("SHIZOKU", "士族:")
+                vals.append(st)
+            else:
+                st = "<br>".join(
+                    list(
+                        map(lambda i: "".join([i[0], "/".join(i[1])]),
+                            val.items())))
+                st = st.replace("HEIMIN", "").replace("SHIZOKU", "士族:")
+                vals.append(st)
+        column = pd.DataFrame(
+            {vowel: vals},
+            index=index,
+        )
+        row_list.append(column)
+    df_row = pd.concat(row_list, axis=1)
+    frames.append(df_row)
 
-# print(df.apply(pd.DataFrame.from_dict))
-# print(df.transpose().to_html())
+df = pd.concat(frames)
+
+with open("resources/phonetics-table.html", 'w') as fp:
+    df.style.set_uuid('a_')\
+            .set_table_styles([
+                #         {
+                #     'selector': 'table, td, th',
+                #     'props': 'border: 1px solid;'
+                # },
+                # {
+                #     'selector': 'table, td',
+                #     'props': 'border-collapse: separate;'
+                # },
+                {
+                    'selector': 'td',
+                    'props': 'text-align:right; padding: 5px;'
+                },
+                {
+                    'selector': 'tr:nth-child(even)',
+                    'props': 'background-color: #f2f2f2;'
+                },
+            ]).to_html(
+        fp,
+        escape=False,
+    )
