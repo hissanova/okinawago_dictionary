@@ -36,13 +36,13 @@ for d in pronunc_table:
             kana = [
                 "".join(chrs) for chrs in product(glottal_stop_syms, syllables)
             ]
-            print(kana)
+            # print(kana)
     # for k in kana:
     #     if "ッ" in k or k.startswith("?"):
     #         print(d)
     if len(ipas) == 2:
         kanas.update({"HEIMIN": kana[:-1], "SHIZOKU": kana[-1:]})
-        print(ipas, kanas)
+        # print(ipas, kanas)
         if romans[0] == "Zu":
             kanas["SHIZOKU"] += "ヅ"
     else:
@@ -52,4 +52,9 @@ for d in pronunc_table:
     new_table.append(d)
 
 with open("resources/phonetics-table.json", 'w') as fp:
-    json.dump(new_table, fp, ensure_ascii=False)
+    json.dump(
+        new_table,
+        fp,
+        ensure_ascii=False,
+        indent=4,
+    )

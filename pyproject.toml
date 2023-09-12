@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "okinawago_dictionary"
-version = "0.3.0"
+version = "0.4.0"
 description = ""
 authors = ["Hisanobu Nkamaura"]
 
@@ -11,6 +11,7 @@ toml = "^0.10.2"
 wanakana-python = "^1.2.2"
 pdfminer = "^20191125"
 "pdfminer.six" = "^20221105"
+pandas = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"

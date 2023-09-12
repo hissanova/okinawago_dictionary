@@ -31,7 +31,13 @@ class Oki2YamatoConverter():
     # meaning string のパース用regex.
     # okinawan_in_sentence_pattern は、e.g.〔?i~i~Ci~i~〕のパターン(IPA&鼻音あり)を除く
     okinawan_in_sentence_pattern = re.compile(r"((?<!〔)[-～a-zA-Z?\s']+(?!~))")
-    ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']+)〕")
+    ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']{2,})〕")
+    roman_ipa_dict = {
+        "C": "ç",
+        "?": "ʔ",
+        "i~": "ĩ",
+        "o~": "õ",
+    }
     example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]{2,}\.)")
 
     @classmethod
@@ -53,12 +59,12 @@ class Oki2YamatoConverter():
         res["bungo-type"] = tsv_row["文語などの\n種別"]
         res["amendment"] = tsv_row["補足"]
         keys = ['意味 1.', '意味 2.', '意味 3.', '意味 4.', '意味 5.']
-        print(res)
         res["meaning"] = [
             cls._parse_meaning_string(tsv_row[key]) for key in keys
             if tsv_row[key]
         ]
         res["remarks"] = tsv_row["備考"]
+        # print(res)
         return res
 
     @classmethod
@@ -93,14 +99,30 @@ class Oki2YamatoConverter():
     @classmethod
     def _kanafy_okinawan_in_yamato(cls, sentence: str):
         found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
-        ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
-        if ipa_in_sentence:
-            print("IPA:", ipa_in_sentence)
-        return [
+
+        okinawan_list = [
             cls._oki_sentence2kana(phoneme)
             for phoneme in found_okis if not re.fullmatch(
                 r"([a-zA-Z?\s～]\.?|-self|apocopated\s?form)", phoneme)
         ]
+        ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
+        if ipa_in_sentence:
+            # print("IPA:", ipa_in_sentence)
+            new_ipas = []
+            for ipa in ipa_in_sentence:
+                roman = ipa.replace("~", "").replace("C", "h")
+                phonetics = generate_phonetics(roman)
+                for k, v in cls.roman_ipa_dict.items():
+                    ipa = ipa.replace(k, v)
+                ipa = re.sub(r"([ĩõ])\1", r"\1ː", ipa)
+                new_ipas.append(ipa)
+                phonetics = phonetics.to_dict()
+                # print(phonetics)
+                phonetics["pronunciation"]["HEIMIN"]["IPA"] = ipa
+                okinawan_list.append(phonetics)
+            # print(new_ipas)
+        # print(okinawan_list)
+        return okinawan_list
 
     @classmethod
     def _parse_meaning_string(cls, sentence: str):
@@ -280,12 +302,18 @@ def main():
 
     entry_list = load_n_convert(converter)
     with open(new_path, 'w') as base_json:
-        json.dump(entry_list, base_json, ensure_ascii=False)
+        json.dump(
+            entry_list,
+            base_json,
+            ensure_ascii=False,
+            indent=4,
+        )
 
     with open(index_table_path, 'w') as table_json_path:
         json.dump(create_index2id_table(entry_list),
                   table_json_path,
-                  ensure_ascii=False)
+                  ensure_ascii=False,
+                  indent=4)
 
 
 if __name__ == "__main__":

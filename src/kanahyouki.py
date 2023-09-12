@@ -11,7 +11,7 @@ word::=mora+...
 from typing import Any, Dict, List, NamedTuple, Tuple
 from enum import Enum
 import json
-from itertools import product
+from itertools import product, zip_longest
 from collections import defaultdict
 # from pprint import pprint
 
@@ -279,17 +279,28 @@ def mora2kana_n_IPA(mora: str) -> Tuple[List[List[str]], List[str]]:
 
 
 def _kana_combinations(kana_list: List[List[str]]) -> List[str]:
+    # print(kana_list)
+    decomposed_kana_list = []
+    for sylls in kana_list:
+        if set("'’ァィゥェォ").intersection(set(sylls[0])):
+            # print("HOGE::", sylls)
+            decomposed_kana_list.append(sylls)
+        else:
+            for chrs in zip_longest(*sylls):
+                chrs = filter(lambda c: c is not None, chrs)
+                decomposed_kana_list.append(sorted(set(chrs)))
     c2pos_dict: Dict[Tuple[str, ...], List[int]] = defaultdict(list)
-    for i, c in enumerate(kana_list):
+    for i, c in enumerate(decomposed_kana_list):
         c2pos_dict[tuple(c)] += [i]
     kana_combs = []
     for c_comb in product(*c2pos_dict.keys()):
-        new_s: List[str] = ["" for _ in range(len(kana_list))]
+        new_s: List[str] = ["" for _ in range(len(decomposed_kana_list))]
         for c, pos in zip(c_comb, list(c2pos_dict.values())):
             for p in pos:
                 new_s[p] = c  # type: ignore
         kana_combs.append("".join(new_s))
         # print(new_s)
+    # print(kana_combs)
     return kana_combs
 
 
