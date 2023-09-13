@@ -1,7 +1,6 @@
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 import json
 from collections import defaultdict, OrderedDict
-from pprint import pprint
 import re
 
 import pandas as pd
@@ -52,8 +51,8 @@ def merge_dict(d1, d2):
     return new_d
 
 
-consonant2syllables_dict: Dict[str, OrderedDict] = defaultdict(
-    lambda: OrderedDict([(v, {
+def default_dict_factory():
+    return OrderedDict([(v, {
         "roman": [],
         "IPA": {
             "HEIMIN": ""
@@ -61,39 +60,37 @@ consonant2syllables_dict: Dict[str, OrderedDict] = defaultdict(
         "kana": {
             "HEIMIN": []
         },
-    }) for v in "aiueo-"]))
+    }) for v in "aiueo-"])
+
+
+consonant2syllables_dict: Dict[str, OrderedDict] = OrderedDict()
 
 for phonetics_entry in phonetics_table:
-    # print(phonetics_entry)
-    for syllable in phonetics_entry["roman"]:
-        consonant, vowel = separate_vowel(syllable)
-        m = re.match(r"[’']?([jw]?)", consonant)
-        if m and m.group():
-            key = m.groups()[0]
-        else:
-            key = consonant
-        # if re.match(r"[^snh'?][jw]", consonant):
-        #     key = consonant[0]
-        # else:
-        #     m = re.match(r"[’']?([jw]?)", consonant)
-        #     if m and m.group():
-        #         key = m.groups()[0]
-        #     else:
-        #         key = consonant
-        # consonant2syllables_dict[key] += [phonetics_entry]
-        # print(consonant2syllables_dict)
-        row_dict = consonant2syllables_dict[key]
-        if vowel:
-            row_dict[vowel] = merge_dict(row_dict[vowel], phonetics_entry)
-        else:
-            row_dict["-"] = merge_dict(row_dict["-"], phonetics_entry)
-        # consonant2syllables_dict[key]
+    syllable = phonetics_entry["roman"][0]
+    consonant, vowel = separate_vowel(syllable)
+    m = re.match(r"[’']?([jw]?)", consonant)
+    if m and m.group():
+        key = m.groups()[0]
+    else:
+        key = consonant
+    row_dict = consonant2syllables_dict.setdefault(key, default_dict_factory())
+    if vowel:
+        row_dict[vowel] = merge_dict(row_dict[vowel], phonetics_entry)
+    else:
+        row_dict["-"] = merge_dict(row_dict["-"], phonetics_entry)
 
-# for k, v in consonant2syllables_dict.items():
-#     print(k, len(v))
-#     print(v)
 
-# print(dict(consonant2syllables_dict))
+def _maybe_embrace(
+    parenthes1: str,
+    ipa: str,
+    parenthes2: str,
+) -> str:
+    if ipa:
+        return parenthes1 + ipa + parenthes2
+    else:
+        return ""
+
+
 frames = []
 for consonant, row in consonant2syllables_dict.items():
     index = pd.MultiIndex.from_tuples([
@@ -107,16 +104,20 @@ for consonant, row in consonant2syllables_dict.items():
         for key in ["roman", "IPA", "kana"]:
             val = element[key]
             if key == "roman":
-                vals.append("/".join(val))
+                vals.append(_maybe_embrace("/", ",".join(val), "/"))
             elif key == "IPA":
                 st = "<br>".join(
-                    list(map(lambda i: "".join([i[0], i[1]]), val.items())))
+                    list(
+                        map(
+                            lambda i: "".join(
+                                [i[0], _maybe_embrace("〔", i[1], "〕")]),
+                            val.items())))
                 st = st.replace("HEIMIN", "").replace("SHIZOKU", "士族:")
                 vals.append(st)
             else:
                 st = "<br>".join(
                     list(
-                        map(lambda i: "".join([i[0], "/".join(i[1])]),
+                        map(lambda i: "".join([i[0], ",".join(i[1])]),
                             val.items())))
                 st = st.replace("HEIMIN", "").replace("SHIZOKU", "士族:")
                 vals.append(st)
@@ -131,25 +132,24 @@ for consonant, row in consonant2syllables_dict.items():
 df = pd.concat(frames)
 
 with open("resources/phonetics-table.html", 'w') as fp:
-    df.style.set_uuid('a_')\
-            .set_table_styles([
-                #         {
-                #     'selector': 'table, td, th',
-                #     'props': 'border: 1px solid;'
-                # },
-                # {
-                #     'selector': 'table, td',
-                #     'props': 'border-collapse: separate;'
-                # },
-                {
-                    'selector': 'td',
-                    'props': 'text-align:right; padding: 5px;'
-                },
-                {
-                    'selector': 'tr:nth-child(even)',
-                    'props': 'background-color: #f2f2f2;'
-                },
-            ]).to_html(
+    df.style.set_table_styles([
+        {
+            'selector': 'table',
+            'props': 'border-collapse: collapse;'  # Not working
+        },
+        {
+            'selector': 'td, th',
+            'props': 'border: 1px solid;'
+        },
+        {
+            'selector': 'td',
+            'props': 'text-align:right; padding: 5px;'
+        },
+        {
+            'selector': 'tr:nth-child(3n+1)',
+            'props': 'background-color: #f2f2f2;'
+        },
+    ]).to_html(
         fp,
         escape=False,
     )
