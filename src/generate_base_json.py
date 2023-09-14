@@ -111,7 +111,7 @@ class Oki2YamatoConverter():
         okinawan_list = [
             cls._oki_sentence2kana(phoneme) for phoneme in found_okis
             if not re.fullmatch(
-                r"(\]?[a-zA-Z?\s～]\.?|-self|apocopated\s?form)", phoneme)
+                r"(\]?[a-zA-Z?\s～\]]\.?|-self|apocopated\s?form)", phoneme)
         ]
         ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
         if ipa_in_sentence:
