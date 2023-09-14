@@ -30,7 +30,8 @@ class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
     # meaning string のパース用regex.
     # okinawan_in_sentence_pattern は、e.g.〔?i~i~Ci~i~〕のパターン(IPA&鼻音あり)を除く
-    okinawan_in_sentence_pattern = re.compile(r"((?<!〔)[-～a-zA-Z?\s']+(?!~))")
+    okinawan_in_sentence_pattern = re.compile(
+        r"((?<!〔)[-～a-zA-Z?\s'=\]]+(?!~))")
     ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']{2,})〕")
     roman_ipa_dict = {
         "C": "ç",
@@ -38,7 +39,11 @@ class Oki2YamatoConverter():
         "i~": "ĩ",
         "o~": "õ",
     }
-    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',]{2,}\.)")
+    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',=\]]{2,}\.)")
+
+    @classmethod
+    def _refine_oki_phoneme(cls, oki_phonemes: str) -> str:
+        return re.sub(r"[(=)\]]", r"", oki_phonemes)
 
     @classmethod
     def convert(cls, tsv_row):
@@ -59,10 +64,12 @@ class Oki2YamatoConverter():
         res["bungo-type"] = tsv_row["文語などの\n種別"]
         res["amendment"] = tsv_row["補足"]
         keys = ['意味 1.', '意味 2.', '意味 3.', '意味 4.', '意味 5.']
+        # print(phonetics["phonemes"]["simplified"])
         res["meaning"] = [
             cls._parse_meaning_string(tsv_row[key].replace(
-                "～", phonetics["phonemes"]["simplified"] + " "))
-            for key in keys if tsv_row[key]
+                "～",
+                cls._refine_oki_phoneme(phonetics["phonemes"]["simplified"]) +
+                " ")) for key in keys if tsv_row[key]
         ]
         res["remarks"] = tsv_row["備考"]
         # print(res)
@@ -102,9 +109,9 @@ class Oki2YamatoConverter():
         found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
 
         okinawan_list = [
-            cls._oki_sentence2kana(phoneme)
-            for phoneme in found_okis if not re.fullmatch(
-                r"([a-zA-Z?\s～]\.?|-self|apocopated\s?form)", phoneme)
+            cls._oki_sentence2kana(phoneme) for phoneme in found_okis
+            if not re.fullmatch(
+                r"(\]?[a-zA-Z?\s～]\.?|-self|apocopated\s?form)", phoneme)
         ]
         ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
         if ipa_in_sentence:

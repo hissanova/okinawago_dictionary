@@ -60,7 +60,7 @@ class OkinawagoDictionary(Dictionary):
                                                   index_to_key_dict)
 
     def normalise_kana(self, kana_str: str) -> str:
-        return "".join([c if c == "’" else to_katakana(c) for c in kana_str])
+        return "".join([c if c == "’" else to_katakana(c, ignore_romaji=True) for c in kana_str])
 
 
 class YamatogoDictionary(Dictionary):
@@ -73,7 +73,7 @@ class YamatogoDictionary(Dictionary):
                                                  index_to_key_dict)
 
     def normalise_kana(self, kana_str: str) -> str:
-        return to_hiragana(kana_str)
+        return to_hiragana(kana_str, ignore_romaji=True)
 
 
 class KatsuyouDictionary(Dictionary):
@@ -86,7 +86,7 @@ class KatsuyouDictionary(Dictionary):
                                                  index_to_key_dict)
 
     def normalise_kana(self, kana_str: str) -> str:
-        return to_katakana(kana_str)
+        return to_katakana(kana_str, ignore_romaji=True)
 
 
 oki_dict = OkinawagoDictionary(raw_oki_dict, raw_oki_ind_dict)
