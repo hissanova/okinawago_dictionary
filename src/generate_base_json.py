@@ -4,7 +4,7 @@ from typing import List
 from csv import DictReader
 from pathlib import Path
 import re
-from pprint import pprint
+# from pprint import pprint
 
 from wanakana import is_romaji, to_hiragana
 
@@ -60,8 +60,9 @@ class Oki2YamatoConverter():
         res["amendment"] = tsv_row["補足"]
         keys = ['意味 1.', '意味 2.', '意味 3.', '意味 4.', '意味 5.']
         res["meaning"] = [
-            cls._parse_meaning_string(tsv_row[key]) for key in keys
-            if tsv_row[key]
+            cls._parse_meaning_string(tsv_row[key].replace(
+                "～", phonetics["phonemes"]["simplified"] + " "))
+            for key in keys if tsv_row[key]
         ]
         res["remarks"] = tsv_row["備考"]
         # print(res)
@@ -116,10 +117,10 @@ class Oki2YamatoConverter():
                     ipa = ipa.replace(k, v)
                 ipa = re.sub(r"([ĩõ])\1", r"\1ː", ipa)
                 new_ipas.append(ipa)
-                phonetics = phonetics.to_dict()
+                phonetics_dict = phonetics.to_dict()
                 # print(phonetics)
-                phonetics["pronunciation"]["HEIMIN"]["IPA"] = ipa
-                okinawan_list.append(phonetics)
+                phonetics_dict["pronunciation"]["HEIMIN"]["IPA"] = ipa
+                okinawan_list.append(phonetics_dict)
             # print(new_ipas)
         # print(okinawan_list)
         return okinawan_list
