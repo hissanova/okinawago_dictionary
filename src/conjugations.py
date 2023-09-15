@@ -1,6 +1,6 @@
-from typing import Dict, NamedTuple, List, Union
+from typing import Dict, NamedTuple, List
 
-from kanahyouki import convert2kana
+from kanahyouki import generate_phonetics, WordPhonetics
 
 
 class Stems(NamedTuple):
@@ -13,21 +13,10 @@ class Stems(NamedTuple):
         return {"語幹": self.語根, "基本": self.基本, "連用": self.連用, "音便": self.音便}
 
 
-def _convert2kana(pronunc: str):
-    if "|" in pronunc:
-        return "|".join(
-            [",".join(convert2kana(pro)) for pro in pronunc.split("|")])
-    return ",".join(convert2kana(pronunc))
-
-
-def add_kana(
-        conj_dict: Dict[str,
-                        str]) -> Dict[str, Dict[str, Union[str, List[str]]]]:
+def _add_kana(conj_dict: Dict[str, str]) -> Dict[str, List[WordPhonetics]]:
     return {
-        conj_type: {
-            "pronunciation": pronunc,
-            "kana": _convert2kana(pronunc)
-        }
+        conj_type:
+        [generate_phonetics(p).to_dict() for p in pronunc.split("|")]
         for conj_type, pronunc in conj_dict.items()
     }
 
@@ -41,9 +30,9 @@ class Conjugation(NamedTuple):
     def to_dict(self):
         return {
             "stems": self.stems.to_dict(),
-            "基本派生形": add_kana(self.基本派生形),
-            "連用派生形": add_kana(self.連用派生形),
-            "音便派生形": add_kana(self.音便派生形)
+            "基本派生形": _add_kana(self.基本派生形),
+            "連用派生形": _add_kana(self.連用派生形),
+            "音便派生形": _add_kana(self.音便派生形)
         }
 
 
@@ -52,25 +41,26 @@ rennyou_suffixes = {"連用形": "i"}
 ombin_suffixes = {"過去形": "aN", "て形": "i", "継続形": "ooN"}
 
 
-def concat_suffix(stem: str, suffix: str) -> str:
+def _concat_suffix(stem: str, suffix: str) -> str:
     if suffix == "i" and stem.endswith("j"):
         return stem[:-1] + suffix
     return stem + suffix
 
 
-def make_derivatives(stem: str, suffix_dict: Dict[str, str]) -> Dict[str, str]:
+def _make_derivatives(stem: str, suffix_dict: Dict[str,
+                                                   str]) -> Dict[str, str]:
     return {
-        key: concat_suffix(stem, suffix)
+        key: _concat_suffix(stem, suffix)
         for key, suffix in suffix_dict.items()
     }
 
 
-def conjugate_from(stems: Stems) -> Conjugation:
+def _conjugate_from(stems: Stems) -> Conjugation:
     return Conjugation(
         stems,
-        make_derivatives(stems.基本, kihonkei_suffixes),
-        make_derivatives(stems.連用, rennyou_suffixes),
-        make_derivatives(stems.音便, ombin_suffixes),
+        _make_derivatives(stems.基本, kihonkei_suffixes),
+        _make_derivatives(stems.連用, rennyou_suffixes),
+        _make_derivatives(stems.音便, ombin_suffixes),
     )
 
 
@@ -88,7 +78,7 @@ def get_conjugations(pronunciation: str, conjs: List[str]) -> Conjugation:
             root + ending[0],
             root + conjs[1][:-1],
         )
-        return conjugate_from(stems)
+        return _conjugate_from(stems)
     elif conj_num == 3:
         stems = Stems(
             root,
@@ -96,7 +86,7 @@ def get_conjugations(pronunciation: str, conjs: List[str]) -> Conjugation:
             root + ending[0],
             root + conjs[2][:-1],
         )
-        return conjugate_from(stems)
+        return _conjugate_from(stems)
     else:
         raise ValueError(f"{pronunciation}, {conjs}")
 
@@ -206,61 +196,61 @@ irregular_verb_conjs = {
         stems := Stems("", "?j", "?j", "?ic"),
         {"否定形": "?jaN|?iraN"},
         {"連用形": "?ii"},
-        make_derivatives(stems.音便, ombin_suffixes),
+        _make_derivatives(stems.音便, ombin_suffixes),
     ),
     "?aN":
     Conjugation(
         stems := Stems("", "?ar", "?aj", "?at"),
         {"否定形": "neeraN"},
-        make_derivatives(stems.連用, rennyou_suffixes),
-        make_derivatives(stems.音便, ombin_suffixes),
+        _make_derivatives(stems.連用, rennyou_suffixes),
+        _make_derivatives(stems.音便, ombin_suffixes),
     ),
     "neeN":
     Conjugation(
         stems := Stems("", "neeNdar", "neej", "neeNt"),
-        make_derivatives(stems.基本, kihonkei_suffixes),
+        _make_derivatives(stems.基本, kihonkei_suffixes),
         {"連用形": "neeN"},
-        make_derivatives(stems.音便, ombin_suffixes),
+        _make_derivatives(stems.音便, ombin_suffixes),
     ),
     "neeraN":
     Conjugation(
         stems := Stems("", "neeNdar", "neej", "neeNt"),
-        make_derivatives(stems.基本, kihonkei_suffixes),
+        _make_derivatives(stems.基本, kihonkei_suffixes),
         {"連用形": "neeN"},
-        make_derivatives(stems.音便, ombin_suffixes),
+        _make_derivatives(stems.音便, ombin_suffixes),
     ),
     "'uN":
-    conjugate_from(Stems("", "'ur", "'uj", "'ut")),
+    _conjugate_from(Stems("", "'ur", "'uj", "'ut")),
     "meeN":
-    conjugate_from(Stems("", "moor", "meej", "mooc")),
+    _conjugate_from(Stems("", "moor", "meej", "mooc")),
     "?imeeN":
-    conjugate_from(Stems("", "?imoor", "?imeej", "?imooc")),
+    _conjugate_from(Stems("", "?imoor", "?imeej", "?imooc")),
     "moo=juN":
-    conjugate_from(Stems("", "moor", "mooj", "mooc")),
+    _conjugate_from(Stems("", "moor", "mooj", "mooc")),
     "miSeeN":
-    conjugate_from(Stems("", "misjoor", "miSeej", "misjooc")),
+    _conjugate_from(Stems("", "misjoor", "miSeej", "misjooc")),
     "-miSe]eN":
-    conjugate_from(Stems("", "-misjoor", "-miSeej", "-misjooc")),
+    _conjugate_from(Stems("", "-misjoor", "-miSeej", "-misjooc")),
     "-NSe]eN":
-    conjugate_from(Stems("", "-Nsjoor", "-NSeej", "-Nsjooc")),
+    _conjugate_from(Stems("", "-Nsjoor", "-NSeej", "-Nsjooc")),
     "?meNSeeN":
-    conjugate_from(Stems("", "?meNsjoor", "?meNSeej", "?meNsjooc")),
+    _conjugate_from(Stems("", "?meNsjoor", "?meNSeej", "?meNsjooc")),
     "?imeNSeeN":
-    conjugate_from(Stems("", "?imeNsjoor", "?imeNSeej", "?imeNsjooc")),
+    _conjugate_from(Stems("", "?imeNsjoor", "?imeNSeej", "?imeNsjooc")),
     "meNseeN":
-    conjugate_from(Stems("", "meNsoor", "meNSeej", "meNsooc")),
+    _conjugate_from(Stems("", "meNsoor", "meNSeej", "meNsooc")),
     "nuuN":
-    conjugate_from(Stems("", "mir", "mij", "'NNc")),
+    _conjugate_from(Stems("", "mir", "mij", "'NNc")),
     "'NNzuN":
-    conjugate_from(Stems("", "'NNd", "'NNz", "'NNc")),
+    _conjugate_from(Stems("", "'NNd", "'NNz", "'NNc")),
     "?icuN":
-    conjugate_from(Stems("", "?ik", "?ic", "?Nz")),
+    _conjugate_from(Stems("", "?ik", "?ic", "?Nz")),
     "kee?icu]N":
-    conjugate_from(Stems("", "kee?ik", "kee?ic", "kee?Nz")),
+    _conjugate_from(Stems("", "kee?ik", "kee?ic", "kee?Nz")),
     "cii?icu]N":
-    conjugate_from(Stems("", "cii?ik", "cii?ic", "cii?Nz")),
+    _conjugate_from(Stems("", "cii?ik", "cii?ic", "cii?Nz")),
     "si=nuN":
-    conjugate_from(Stems("si", "sin", "sin", "siz")),
+    _conjugate_from(Stems("si", "sin", "sin", "siz")),
 }
 
 prefixes = [
@@ -277,7 +267,7 @@ prefixes = [
 ]
 
 sonkei_verbs = {
-    prefix + "Se]eN": conjugate_from(
+    prefix + "Se]eN": _conjugate_from(
         Stems("", prefix + "sjoor", prefix + "Seej", prefix + "sjooc"))
     for prefix in prefixes
 }

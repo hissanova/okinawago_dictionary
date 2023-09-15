@@ -1,0 +1,2147 @@
+[
+    {
+        "roman": [
+            "a"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ア"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "a"
+        }
+    },
+    {
+        "roman": [
+            "i"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "イ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "i"
+        }
+    },
+    {
+        "roman": [
+            "u"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "u"
+        }
+    },
+    {
+        "roman": [
+            "e"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "エ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "e"
+        }
+    },
+    {
+        "roman": [
+            "o"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "オ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "o"
+        }
+    },
+    {
+        "roman": [
+            "?a"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ア"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔa"
+        }
+    },
+    {
+        "roman": [
+            "?i"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "イ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔi"
+        }
+    },
+    {
+        "roman": [
+            "?u"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔu"
+        }
+    },
+    {
+        "roman": [
+            "?e"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "エ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔe"
+        }
+    },
+    {
+        "roman": [
+            "?o"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "オ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔo"
+        }
+    },
+    {
+        "roman": [
+            "’a",
+            "'a"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "’ア",
+                "'ア",
+                "ァア",
+                "アァ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "a"
+        }
+    },
+    {
+        "roman": [
+            "’i",
+            "'i",
+            "ji"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "’イ",
+                "'イ",
+                "ィイ",
+                "イィ",
+                "ヰ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "i"
+        }
+    },
+    {
+        "roman": [
+            "’u",
+            "'u",
+            "wu",
+            "'wu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "’ウ",
+                "'ウ",
+                "ゥウ",
+                "ウゥ",
+                "ヲゥ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "u"
+        }
+    },
+    {
+        "roman": [
+            "’e",
+            "'e"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "’エ",
+                "'エ",
+                "ェエ",
+                "エェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "e"
+        }
+    },
+    {
+        "roman": [
+            "’o",
+            "'o"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "’オ",
+                "'オ",
+                "ォオ",
+                "オォ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "o"
+        }
+    },
+    {
+        "roman": [
+            "ka"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "カ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ka"
+        }
+    },
+    {
+        "roman": [
+            "ki"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "キ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ki"
+        }
+    },
+    {
+        "roman": [
+            "ku"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ク"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ku"
+        }
+    },
+    {
+        "roman": [
+            "ke"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ケ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ke"
+        }
+    },
+    {
+        "roman": [
+            "ko"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "コ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ko"
+        }
+    },
+    {
+        "roman": [
+            "kja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "キャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kja"
+        }
+    },
+    {
+        "roman": [
+            "kju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "キュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kju"
+        }
+    },
+    {
+        "roman": [
+            "kjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "キョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kjo"
+        }
+    },
+    {
+        "roman": [
+            "kwa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "クヮ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kwa"
+        }
+    },
+    {
+        "roman": [
+            "kwi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "クィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kwi"
+        }
+    },
+    {
+        "roman": [
+            "kwe"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "クェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "kwe"
+        }
+    },
+    {
+        "roman": [
+            "ga"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ガ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡa"
+        }
+    },
+    {
+        "roman": [
+            "gi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ギ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡi"
+        }
+    },
+    {
+        "roman": [
+            "gu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "グ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡu"
+        }
+    },
+    {
+        "roman": [
+            "ge"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ゲ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡe"
+        }
+    },
+    {
+        "roman": [
+            "go"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ゴ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡo"
+        }
+    },
+    {
+        "roman": [
+            "gja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ギャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡja"
+        }
+    },
+    {
+        "roman": [
+            "gju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ギュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡju"
+        }
+    },
+    {
+        "roman": [
+            "gjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ギョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡjo"
+        }
+    },
+    {
+        "roman": [
+            "gwa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "グヮ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡwa"
+        }
+    },
+    {
+        "roman": [
+            "gwi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "グィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡwi"
+        }
+    },
+    {
+        "roman": [
+            "gwe"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "グェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɡwe"
+        }
+    },
+    {
+        "roman": [
+            "sa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "サ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "sa"
+        }
+    },
+    {
+        "roman": [
+            "si"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "シ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʃi"
+        }
+    },
+    {
+        "roman": [
+            "su"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ス"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "su"
+        }
+    },
+    {
+        "roman": [
+            "se"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "シェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʃe"
+        }
+    },
+    {
+        "roman": [
+            "so"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ソ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "so"
+        }
+    },
+    {
+        "roman": [
+            "Si"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "シ"
+            ],
+            "SHIZOKU": [
+                "スィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʃi",
+            "SHIZOKU": "si"
+        }
+    },
+    {
+        "roman": [
+            "Se"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "シェ"
+            ],
+            "SHIZOKU": [
+                "セ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʃe",
+            "SHIZOKU": "se"
+        }
+    },
+    {
+        "roman": [
+            "sja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "サ"
+            ],
+            "SHIZOKU": [
+                "シャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "sa",
+            "SHIZOKU": "ʃa"
+        }
+    },
+    {
+        "roman": [
+            "sju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ス"
+            ],
+            "SHIZOKU": [
+                "シュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "su",
+            "SHIZOKU": "ʃu"
+        }
+    },
+    {
+        "roman": [
+            "sjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ソ"
+            ],
+            "SHIZOKU": [
+                "ショ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "so",
+            "SHIZOKU": "ʃo"
+        }
+    },
+    {
+        "roman": [
+            "za"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジャ",
+                "ヂャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷa"
+        }
+    },
+    {
+        "roman": [
+            "zi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジ",
+                "ヂ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷi"
+        }
+    },
+    {
+        "roman": [
+            "zu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジュ",
+                "ヂュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷu"
+        }
+    },
+    {
+        "roman": [
+            "ze"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジェ",
+                "ヂェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷe"
+        }
+    },
+    {
+        "roman": [
+            "zo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジョ",
+                "ヂョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷo"
+        }
+    },
+    {
+        "roman": [
+            "Za"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジャ",
+                "ヂャ"
+            ],
+            "SHIZOKU": [
+                "ザ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷa",
+            "SHIZOKU": "dza"
+        }
+    },
+    {
+        "roman": [
+            "Zi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジ",
+                "ヂ"
+            ],
+            "SHIZOKU": [
+                "ヅィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷi",
+            "SHIZOKU": "dzi"
+        }
+    },
+    {
+        "roman": [
+            "Zu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジュ",
+                "ヂュ"
+            ],
+            "SHIZOKU": [
+                "ズ",
+                "ヅ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷu",
+            "SHIZOKU": "dzu"
+        }
+    },
+    {
+        "roman": [
+            "Ze"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジェ",
+                "ヂェ"
+            ],
+            "SHIZOKU": [
+                "ゼ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷe",
+            "SHIZOKU": "dze"
+        }
+    },
+    {
+        "roman": [
+            "Zo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ジョ",
+                "ヂョ"
+            ],
+            "SHIZOKU": [
+                "ゾ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "dƷo",
+            "SHIZOKU": "dzo"
+        }
+    },
+    {
+        "roman": [
+            "ta"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "タ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ta"
+        }
+    },
+    {
+        "roman": [
+            "ti"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ティ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ti"
+        }
+    },
+    {
+        "roman": [
+            "tu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "トゥ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tu"
+        }
+    },
+    {
+        "roman": [
+            "te"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "テ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "te"
+        }
+    },
+    {
+        "roman": [
+            "to"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ト"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "to"
+        }
+    },
+    {
+        "roman": [
+            "da"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ダ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "da"
+        }
+    },
+    {
+        "roman": [
+            "di"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ディ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "di"
+        }
+    },
+    {
+        "roman": [
+            "du"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ドゥ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "du"
+        }
+    },
+    {
+        "roman": [
+            "de"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "デ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "de"
+        }
+    },
+    {
+        "roman": [
+            "do"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ド"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "do"
+        }
+    },
+    {
+        "roman": [
+            "ca"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃa"
+        }
+    },
+    {
+        "roman": [
+            "ci"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃi"
+        }
+    },
+    {
+        "roman": [
+            "cu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃu"
+        }
+    },
+    {
+        "roman": [
+            "ce"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃe"
+        }
+    },
+    {
+        "roman": [
+            "co"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃo"
+        }
+    },
+    {
+        "roman": [
+            "Ca"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チャ"
+            ],
+            "SHIZOKU": [
+                "ツァ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃa",
+            "SHIZOKU": "tsa"
+        }
+    },
+    {
+        "roman": [
+            "Ci"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チ"
+            ],
+            "SHIZOKU": [
+                "ツィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃi",
+            "SHIZOKU": "tsi"
+        }
+    },
+    {
+        "roman": [
+            "Cu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チュ"
+            ],
+            "SHIZOKU": [
+                "ツ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃu",
+            "SHIZOKU": "tsu"
+        }
+    },
+    {
+        "roman": [
+            "Ce"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チェ"
+            ],
+            "SHIZOKU": [
+                "ツェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃe",
+            "SHIZOKU": "tse"
+        }
+    },
+    {
+        "roman": [
+            "Co"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "チョ"
+            ],
+            "SHIZOKU": [
+                "ツォ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "tʃo",
+            "SHIZOKU": "tso"
+        }
+    },
+    {
+        "roman": [
+            "na"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ナ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "na"
+        }
+    },
+    {
+        "roman": [
+            "ni"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ニ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɲi"
+        }
+    },
+    {
+        "roman": [
+            "nu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヌ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "nu"
+        }
+    },
+    {
+        "roman": [
+            "ne"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ネ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ne"
+        }
+    },
+    {
+        "roman": [
+            "no"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ノ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "no"
+        }
+    },
+    {
+        "roman": [
+            "nja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ニャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɲa"
+        }
+    },
+    {
+        "roman": [
+            "nju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ニュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɲu"
+        }
+    },
+    {
+        "roman": [
+            "ha"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ハ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ha"
+        }
+    },
+    {
+        "roman": [
+            "hi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヒ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "çi"
+        }
+    },
+    {
+        "roman": [
+            "hu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "フ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɸu"
+        }
+    },
+    {
+        "roman": [
+            "he"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヘ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "he"
+        }
+    },
+    {
+        "roman": [
+            "ho"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ホ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ho"
+        }
+    },
+    {
+        "roman": [
+            "hja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヒャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ça"
+        }
+    },
+    {
+        "roman": [
+            "hju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヒュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "çu"
+        }
+    },
+    {
+        "roman": [
+            "hjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヒョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ço"
+        }
+    },
+    {
+        "roman": [
+            "hwa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ファ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɸa"
+        }
+    },
+    {
+        "roman": [
+            "hwi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "フィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɸi"
+        }
+    },
+    {
+        "roman": [
+            "hwe"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "フェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɸe"
+        }
+    },
+    {
+        "roman": [
+            "pa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "パ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pa"
+        }
+    },
+    {
+        "roman": [
+            "pi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ピ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pi"
+        }
+    },
+    {
+        "roman": [
+            "pu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "プ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pu"
+        }
+    },
+    {
+        "roman": [
+            "pe"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ぺ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pe"
+        }
+    },
+    {
+        "roman": [
+            "po"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ポ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "po"
+        }
+    },
+    {
+        "roman": [
+            "pja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ピャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pja"
+        }
+    },
+    {
+        "roman": [
+            "pju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ピュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pju"
+        }
+    },
+    {
+        "roman": [
+            "pjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ピョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "pjo"
+        }
+    },
+    {
+        "roman": [
+            "ba"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "バ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ba"
+        }
+    },
+    {
+        "roman": [
+            "bi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ビ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bi"
+        }
+    },
+    {
+        "roman": [
+            "bu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ブ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bu"
+        }
+    },
+    {
+        "roman": [
+            "be"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ベ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "be"
+        }
+    },
+    {
+        "roman": [
+            "bo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ボ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bo"
+        }
+    },
+    {
+        "roman": [
+            "bja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ビャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bja"
+        }
+    },
+    {
+        "roman": [
+            "bju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ビュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bju"
+        }
+    },
+    {
+        "roman": [
+            "bjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ビョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bjo"
+        }
+    },
+    {
+        "roman": [
+            "bwi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ブィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "bwi"
+        }
+    },
+    {
+        "roman": [
+            "ma"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "マ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ma"
+        }
+    },
+    {
+        "roman": [
+            "mi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ミ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mi"
+        }
+    },
+    {
+        "roman": [
+            "mu"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ム"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mu"
+        }
+    },
+    {
+        "roman": [
+            "me"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "メ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "me"
+        }
+    },
+    {
+        "roman": [
+            "mo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "モ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mo"
+        }
+    },
+    {
+        "roman": [
+            "?me"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔメ",
+                "?メ",
+                "ッメ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔme"
+        }
+    },
+    {
+        "roman": [
+            "mja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ミャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mja"
+        }
+    },
+    {
+        "roman": [
+            "mju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ミュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mju"
+        }
+    },
+    {
+        "roman": [
+            "mjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ミョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "mjo"
+        }
+    },
+    {
+        "roman": [
+            "ja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヤ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ja"
+        }
+    },
+    {
+        "roman": [
+            "ju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ユ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ju"
+        }
+    },
+    {
+        "roman": [
+            "je"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "イェ",
+                "ヰェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "je"
+        }
+    },
+    {
+        "roman": [
+            "jo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヨ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "jo"
+        }
+    },
+    {
+        "roman": [
+            "'ja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヤ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'ja"
+        }
+    },
+    {
+        "roman": [
+            "'ju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ユ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'ju"
+        }
+    },
+    {
+        "roman": [
+            "'je"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "イェ",
+                "ヰェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'je"
+        }
+    },
+    {
+        "roman": [
+            "'jo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ヨ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'jo"
+        }
+    },
+    {
+        "roman": [
+            "?ja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔヤ",
+                "?ヤ",
+                "ッヤ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔja"
+        }
+    },
+    {
+        "roman": [
+            "?ju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔユ",
+                "?ユ",
+                "ッユ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔju"
+        }
+    },
+    {
+        "roman": [
+            "?je"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔイェ",
+                "ʔヰェ",
+                "?イェ",
+                "?ヰェ",
+                "ッイェ",
+                "ッヰェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔje"
+        }
+    },
+    {
+        "roman": [
+            "?jo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔヨ",
+                "?ヨ",
+                "ッヨ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔjo"
+        }
+    },
+    {
+        "roman": [
+            "ra"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ラ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾa"
+        }
+    },
+    {
+        "roman": [
+            "ri"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "リ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾi"
+        }
+    },
+    {
+        "roman": [
+            "ru"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ル"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾu"
+        }
+    },
+    {
+        "roman": [
+            "re"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "レ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾe"
+        }
+    },
+    {
+        "roman": [
+            "ro"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ロ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾo"
+        }
+    },
+    {
+        "roman": [
+            "rja"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "リャ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾja"
+        }
+    },
+    {
+        "roman": [
+            "rju"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "リュ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾju"
+        }
+    },
+    {
+        "roman": [
+            "rjo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "リョ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ɾjo"
+        }
+    },
+    {
+        "roman": [
+            "wa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ワ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "wa"
+        }
+    },
+    {
+        "roman": [
+            "wi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "wi"
+        }
+    },
+    {
+        "roman": [
+            "we"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "we"
+        }
+    },
+    {
+        "roman": [
+            "wo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウォ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "wo"
+        }
+    },
+    {
+        "roman": [
+            "?wa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔワ",
+                "?ワ",
+                "ッワ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔwa"
+        }
+    },
+    {
+        "roman": [
+            "?wi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔウィ",
+                "?ウィ",
+                "ッウィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔwi"
+        }
+    },
+    {
+        "roman": [
+            "?we"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ʔウェ",
+                "?ウェ",
+                "ッウェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔwe"
+        }
+    },
+    {
+        "roman": [
+            "'wa"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ワ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'wa"
+        }
+    },
+    {
+        "roman": [
+            "'wi"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウィ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'wi"
+        }
+    },
+    {
+        "roman": [
+            "'we"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウェ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'we"
+        }
+    },
+    {
+        "roman": [
+            "'wo"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ウォ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "'wo"
+        }
+    },
+    {
+        "roman": [
+            "N"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ン"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "m,n,ŋ,N"
+        }
+    },
+    {
+        "roman": [
+            "'N"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "'ン"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "m,n,ŋ,N"
+        }
+    },
+    {
+        "roman": [
+            "?N"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ッン"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": "ʔm,ʔn,ʔŋ"
+        }
+    },
+    {
+        "roman": [
+            "Q"
+        ],
+        "kana": {
+            "HEIMIN": [
+                "ッ"
+            ]
+        },
+        "IPA": {
+            "HEIMIN": ""
+        }
+    }
+]

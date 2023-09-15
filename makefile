@@ -9,5 +9,8 @@ oki-dict :
 yamato-dict :
 	$(json-generator) y2o
 
+katsuyou-dict:
+	poetry run python src/uchinaaguchi_katsuyou_jiten/generate_dictionary.py --format json
+
 build :
 	poetry build
