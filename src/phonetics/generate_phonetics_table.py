@@ -1,5 +1,6 @@
 import json
 from itertools import product
+import re
 
 with open("resources/roman-to-ipa-dict.json") as fp:
     roman_ipa_dict = json.load(fp)
@@ -14,32 +15,35 @@ glottal_stop_syms = [roman_ipa_dict["?"], "?", "ッ"]
 for d in pronunc_table:
     romans = d['roman']
     ipas = {}
+    kana = d['kana']
     if len(romans) > 1:
         ipas = {"HEIMIN": romans[0][-1]}
     else:
-        for roman in romans:
-            ipas = {"HEIMIN": roman}
-            for k, v in roman_ipa_dict.items():
-                if k in roman and "ts" not in roman:
-                    ipa = [roman.replace(k, v_) for v_ in v.split("|")]
-                    ipas.update({
-                        s_class: phone
-                        for s_class, phone in zip(["HEIMIN", "SHIZOKU"], ipa)
-                    })
-    kanas = {}
-    kana = d['kana']
-    if len(romans) == 1:
-        r = romans[0]
-        if r[0] == "?" and romans[0][1] not in ["a", "i", "u", "e", "o"]:
-            # print(d)
+        roman = romans[0]
+        ipas = {"HEIMIN": roman}
+        for k, v in roman_ipa_dict.items():
+            if k in roman and "ts" not in roman:
+                ipa = [roman.replace(k, v_) for v_ in v.split("|")]
+                ipas.update({
+                    s_class: phone
+                    for s_class, phone in zip(["HEIMIN", "SHIZOKU"], ipa)
+                })
+        if re.match(r"\?[^aiueoN].*", roman):
             syllables = list({syllable[1:] for syllable in kana})
             kana = [
                 "".join(chrs) for chrs in product(glottal_stop_syms, syllables)
             ]
-            # print(kana)
-    # for k in kana:
-    #     if "ッ" in k or k.startswith("?"):
-    #         print(d)
+        elif m := re.match(r"(['?]?)N", roman):
+            print(m, m.group(), m.groups(), m.groupdict())
+            pred = m.groups()[0]
+            if pred == "?":
+                ipas = {"HEIMIN": "ʔm,ʔn,ʔŋ"}
+            else:
+                ipas = {"HEIMIN": "m,n,ŋ,N"}
+        elif roman == "Q":
+            ipas = {"HEIMIN": ""}
+
+    kanas = {}
     if len(ipas) == 2:
         kanas.update({"HEIMIN": kana[:-1], "SHIZOKU": kana[-1:]})
         # print(ipas, kanas)

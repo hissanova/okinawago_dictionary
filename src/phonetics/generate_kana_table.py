@@ -68,7 +68,7 @@ consonant2syllables_dict: Dict[str, OrderedDict] = OrderedDict()
 for phonetics_entry in phonetics_table:
     syllable = phonetics_entry["roman"][0]
     consonant, vowel = separate_vowel(syllable)
-    m = re.match(r"[’']?([jw]?)", consonant)
+    m = re.match(r"[’']?([jwN]?)", consonant)
     if m and m.group():
         key = m.groups()[0]
     else:
@@ -132,24 +132,8 @@ for consonant, row in consonant2syllables_dict.items():
 df = pd.concat(frames)
 
 with open("resources/phonetics-table.html", 'w') as fp:
-    df.style.set_table_styles([
-        {
-            'selector': 'table',
-            'props': 'border-collapse: collapse;'  # Not working
-        },
-        {
-            'selector': 'td, th',
-            'props': 'border: 1px solid;'
-        },
-        {
-            'selector': 'td',
-            'props': 'text-align:right; padding: 5px;'
-        },
-        {
-            'selector': 'tr:nth-child(3n+1)',
-            'props': 'background-color: #f2f2f2;'
-        },
-    ]).to_html(
-        fp,
-        escape=False,
-    )
+    df.style.set_uuid("phonetics").applymap(
+        lambda cell: (None if cell else "background-color: grey")).to_html(
+            fp,
+            escape=False,
+        )
