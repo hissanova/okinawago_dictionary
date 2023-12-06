@@ -50,6 +50,41 @@ for entry in phonetics_dict:
     for roman in romans:
         roman_to_kana_n_ipa[roman] = entry
 
+roman_to_kana_n_ipa.update({
+    'N': {
+        'kana': {
+            'HEIMIN': ['ン']
+        },
+        'IPA': {
+            'HEIMIN': 'N'
+        }
+    },
+    "'N": {
+        'kana': {
+            'HEIMIN': ["'ン"]
+        },
+        'IPA': {
+            'HEIMIN': 'N'
+        }
+    },
+    '?N': {
+        'kana': {
+            'HEIMIN': ['ッン']
+        },
+        'IPA': {
+            'HEIMIN': 'ʔN'
+        }
+    },
+    'Q': {
+        'kana': {
+            'HEIMIN': ['ッ']
+        },
+        'IPA': {
+            'HEIMIN': 'Q'
+        }
+    },
+})
+
 
 def _delete_others(pronunciation: str) -> str:
     """発音記号の文字列から、子音、半母音、母音以外の文字を消去します。"""
@@ -269,6 +304,7 @@ def mora2kana_n_IPA(mora: str) -> Tuple[List[List[str]], List[str]]:
         mora = mora[:-1]
         long_vowel_sym = ["ー", "ː"]
     kana_n_ipa = roman_to_kana_n_ipa[mora]
+    # print("HOGE", kana_n_ipa)
     return (
         [
             _add_char_to_all(k, long_vowel_sym[0])
@@ -316,6 +352,7 @@ def get_ipa_n_kana(
 
     moras = split_into_moras(phoneme_symbols_in_excel)
     converted_moras = [mora2kana_n_IPA(m) for m in moras]
+    # print("converted_moras: ", converted_moras)
     kanas = [m[0] for m in converted_moras]
     ipas = [m[1] for m in converted_moras]
     ipas = _sokuon_n_hatsuon_to_ipa(ipas)

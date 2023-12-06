@@ -4,7 +4,7 @@ from typing import List
 from csv import DictReader
 from pathlib import Path
 import re
-# from pprint import pprint
+from pprint import pprint
 
 from wanakana import is_romaji, to_hiragana
 
@@ -26,12 +26,36 @@ unicode_ranges = {
 total_uni_ranges = "".join([r for r in unicode_ranges.values()])
 
 
+def count_parenthesis(s: str):
+    return s.count("（"), s.count("）")
+
+
+def check_paren_parity(n_opening: int, n_closing: int):
+    return n_opening - n_closing
+
+
+def split_sentence(ex, sentence):
+    split_sentence = []
+    for oki in ex.findall(sentence):
+        p = re.compile(re.escape(oki))
+        pre, post = p.split(sentence, maxsplit=1)
+        pre_parity = check_paren_parity(*count_parenthesis(pre))
+        post_parity = check_paren_parity(*count_parenthesis(post))
+        if pre_parity + post_parity != 0:
+            raise Exception
+        if pre_parity == 0:
+            split_sentence.extend([pre, oki])
+            sentence = post
+    split_sentence.append(sentence)
+    return split_sentence
+
+
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
     # meaning string のパース用regex.
     # okinawan_in_sentence_pattern は、e.g.〔?i~i~Ci~i~〕のパターン(IPA&鼻音あり)を除く
     okinawan_in_sentence_pattern = re.compile(
-        r"((?<!〔)[-～a-zA-Z?\s'=\]]+(?!~))")
+        r"((?!])(?<!〔)[-～a-zCSZNQ?\s'=\]]+(?!~))")
     ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']{2,})〕")
     roman_ipa_dict = {
         "C": "ç",
@@ -39,7 +63,11 @@ class Oki2YamatoConverter():
         "i~": "ĩ",
         "o~": "õ",
     }
-    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',=\]]{2,}\.)")
+    example_sentences_pattern = re.compile(
+        r"((?![（）])[-～a-zCSZNQ?\s',=\]（）]{2,}\.)")
+
+    # example_sentences_pattern = re.compile(
+    #     r"(?!）)(?<!（)([-～a-zCSZNQ?\s',=\]（）]{2,}\.(?=!.*）))")
 
     @classmethod
     def _refine_oki_phoneme(cls, oki_phonemes: str) -> str:
@@ -107,12 +135,13 @@ class Oki2YamatoConverter():
     @classmethod
     def _kanafy_okinawan_in_yamato(cls, sentence: str):
         found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
-
+        # print(found_okis)
         okinawan_list = [
             cls._oki_sentence2kana(phoneme) for phoneme in found_okis
             if not re.fullmatch(
                 r"(\]?[a-zA-Z?\s～\]]\.?|-self|apocopated\s?form)", phoneme)
         ]
+        # print(okinawan_list)
         ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
         if ipa_in_sentence:
             # print("IPA:", ipa_in_sentence)
@@ -125,7 +154,6 @@ class Oki2YamatoConverter():
                 ipa = re.sub(r"([ĩõ])\1", r"\1ː", ipa)
                 new_ipas.append(ipa)
                 phonetics_dict = phonetics.to_dict()
-                # print(phonetics)
                 phonetics_dict["pronunciation"]["HEIMIN"]["IPA"] = ipa
                 okinawan_list.append(phonetics_dict)
             # print(new_ipas)
@@ -136,7 +164,9 @@ class Oki2YamatoConverter():
     def _parse_meaning_string(cls, sentence: str):
         paragraphs = []
         # print("Original: ", sentence)
-        split_s = cls.example_sentences_pattern.split(sentence)
+        # split_s = cls.example_sentences_pattern.split(sentence)
+        split_s = split_sentence(cls.example_sentences_pattern, sentence)
+        # print("Split_s: ", split_s)
         sentence = split_s[0]
         okinawago = cls._kanafy_okinawan_in_yamato(sentence)
         # pprint("SPLIT_S: ")
