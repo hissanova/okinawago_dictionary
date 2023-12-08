@@ -1,16 +1,18 @@
-import argparse
 import json
 from typing import List
 from csv import DictReader
 from pathlib import Path
 import re
-# from pprint import pprint
+from pprint import pprint
+from difflib import unified_diff
+import sys
 
 from wanakana import is_romaji, to_hiragana
 
 from utils import create_index2id_table
 from kanahyouki import generate_phonetics, WordPhonetics, PhonemeSymols, Pronunciation, SocialClass
 from pos import get_pos
+import click
 
 unicode_ranges = {
     "hiragana": "\u3041-\u3096",
@@ -26,12 +28,36 @@ unicode_ranges = {
 total_uni_ranges = "".join([r for r in unicode_ranges.values()])
 
 
+def count_parenthesis(s: str):
+    return s.count("（"), s.count("）")
+
+
+def check_paren_parity(n_opening: int, n_closing: int):
+    return n_opening - n_closing
+
+
+def split_sentence(ex, sentence):
+    split_sentence = []
+    for oki in ex.findall(sentence):
+        p = re.compile(re.escape(oki))
+        pre, post = p.split(sentence, maxsplit=1)
+        pre_parity = check_paren_parity(*count_parenthesis(pre))
+        post_parity = check_paren_parity(*count_parenthesis(post))
+        if pre_parity + post_parity != 0:
+            raise Exception
+        if pre_parity == 0:
+            split_sentence.extend([pre, oki])
+            sentence = post
+    split_sentence.append(sentence)
+    return split_sentence
+
+
 class Oki2YamatoConverter():
     source = "./resources/base_lists/okinawa_01.tsv"
     # meaning string のパース用regex.
     # okinawan_in_sentence_pattern は、e.g.〔?i~i~Ci~i~〕のパターン(IPA&鼻音あり)を除く
     okinawan_in_sentence_pattern = re.compile(
-        r"((?<!〔)[-～a-zA-Z?\s'=\]]+(?!~))")
+        r"((?!])(?<!〔)[-～a-zCSZNQ?\s'=\]]+(?!~))")
     ipa_in_sentence_pattern = re.compile(r"〔([-~～a-zA-Z?\s']{2,})〕")
     roman_ipa_dict = {
         "C": "ç",
@@ -39,7 +65,11 @@ class Oki2YamatoConverter():
         "i~": "ĩ",
         "o~": "õ",
     }
-    example_sentences_pattern = re.compile(r"([-～a-zA-Z?\s',=\]]{2,}\.)")
+    example_sentences_pattern = re.compile(
+        r"((?![（）,])[-～a-zCSZNQ?\s',=\]（）]{2,}\.)")
+
+    # example_sentences_pattern = re.compile(
+    #     r"(?!）)(?<!（)([-～a-zCSZNQ?\s',=\]（）]{2,}\.(?=!.*）))")
 
     @classmethod
     def _refine_oki_phoneme(cls, oki_phonemes: str) -> str:
@@ -107,12 +137,13 @@ class Oki2YamatoConverter():
     @classmethod
     def _kanafy_okinawan_in_yamato(cls, sentence: str):
         found_okis = cls.okinawan_in_sentence_pattern.findall(sentence)
-
+        # print(found_okis)
         okinawan_list = [
             cls._oki_sentence2kana(phoneme) for phoneme in found_okis
             if not re.fullmatch(
                 r"(\]?[a-zA-Z?\s～\]]\.?|-self|apocopated\s?form)", phoneme)
         ]
+        # print(okinawan_list)
         ipa_in_sentence = cls.ipa_in_sentence_pattern.findall(sentence)
         if ipa_in_sentence:
             # print("IPA:", ipa_in_sentence)
@@ -125,7 +156,6 @@ class Oki2YamatoConverter():
                 ipa = re.sub(r"([ĩõ])\1", r"\1ː", ipa)
                 new_ipas.append(ipa)
                 phonetics_dict = phonetics.to_dict()
-                # print(phonetics)
                 phonetics_dict["pronunciation"]["HEIMIN"]["IPA"] = ipa
                 okinawan_list.append(phonetics_dict)
             # print(new_ipas)
@@ -136,7 +166,9 @@ class Oki2YamatoConverter():
     def _parse_meaning_string(cls, sentence: str):
         paragraphs = []
         # print("Original: ", sentence)
-        split_s = cls.example_sentences_pattern.split(sentence)
+        # split_s = cls.example_sentences_pattern.split(sentence)
+        split_s = split_sentence(cls.example_sentences_pattern, sentence)
+        # print("Split_s: ", split_s)
         sentence = split_s[0]
         okinawago = cls._kanafy_okinawan_in_yamato(sentence)
         # pprint("SPLIT_S: ")
@@ -273,19 +305,6 @@ class Yamato2OkiConverter():
         return [e for sublist in nested_list for e in sublist]
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('dict_type',
-                        choices=['o2y', 'y2o'],
-                        help="""
-        o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\n
-        y2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)""")
-    return parser.parse_args()
-
-
-converter_dict = {"o2y": Oki2YamatoConverter, "y2o": Yamato2OkiConverter}
-
-
 def load_n_convert(converter):
     entry_list = []
     with open(converter.source, 'r') as base_file:
@@ -298,9 +317,63 @@ def load_n_convert(converter):
     return entry_list
 
 
-def main():
-    args = parse_args()
-    converter = converter_dict[args.dict_type]
+converter_dict = {"o2y": Oki2YamatoConverter, "y2o": Yamato2OkiConverter}
+
+
+@click.group()
+def cli():
+    """
+    DICT_TYPE は以下の種類がある。\n
+        o2y: 沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\n
+        y2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)
+    """
+    pass
+
+
+@click.command()
+@click.argument(
+    'dict_type',
+    type=click.Choice(['o2y', 'y2o'], case_sensitive=False),
+)
+def diff(dict_type):
+    converter = converter_dict[dict_type]
+
+    target_dir = Path(__file__).parent / "okinawago_dictionary"
+    json_path = target_dir / Path(converter.source).name.replace(
+        ".tsv", ".json")
+
+    entry_list = load_n_convert(converter)
+    with open(json_path, 'r') as old_file:
+        old_json = json.load(old_file)
+        old_json_s = json.dumps(
+            old_json,
+            ensure_ascii=False,
+            indent=4,
+        )
+        new_json_s = json.dumps(
+            entry_list,
+            ensure_ascii=False,
+            indent=4,
+        )
+        sys.stdout.writelines(
+            unified_diff(
+                old_json_s.splitlines(keepends=True),
+                new_json_s.splitlines(keepends=True),
+            ))
+
+
+cli.add_command(diff)
+
+
+@click.command()
+@click.argument(
+    'dict_type',
+    type=click.Choice(['o2y', 'y2o'], case_sensitive=False),
+)
+@click.confirmation_option(
+    prompt='Are you sure you want to write out the diffs?')
+def write(dict_type):
+    converter = converter_dict[dict_type]
 
     target_dir = Path(__file__).parent / "okinawago_dictionary"
     new_path = target_dir / Path(converter.source).name.replace(
@@ -324,5 +397,7 @@ def main():
                   indent=4)
 
 
-if __name__ == "__main__":
-    main()
+cli.add_command(write)
+
+if __name__ == '__main__':
+    cli()

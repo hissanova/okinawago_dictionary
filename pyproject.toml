@@ -24,6 +24,7 @@ pdfminer = "^20191125"
 Jinja2 = "^3.1.2"
 openpyxl = "^3.1.2"
 toml = "^0.10.2"
+click = "^8.1.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -31,3 +32,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pylint]
 max-line-length = 120
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
