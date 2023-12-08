@@ -7,7 +7,6 @@ authors = ["Hisanobu Nkamaura"]
 [tool.poetry.dependencies]
 python = "^3.10"
 wanakana-python = "^1.2.2"
-click = "^8.1.7"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
@@ -25,6 +24,7 @@ pdfminer = "^20191125"
 Jinja2 = "^3.1.2"
 openpyxl = "^3.1.2"
 toml = "^0.10.2"
+click = "^8.1.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
