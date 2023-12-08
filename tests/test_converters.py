@@ -1,7 +1,5 @@
 from src.generate_base_json import Oki2YamatoConverter, split_sentence
 
-import pytest
-
 okinawan_in_sentence_pattern = Oki2YamatoConverter.okinawan_in_sentence_pattern
 example_sentences_pattern = Oki2YamatoConverter.example_sentences_pattern
 

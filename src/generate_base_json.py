@@ -1,16 +1,18 @@
-import argparse
 import json
 from typing import List
 from csv import DictReader
 from pathlib import Path
 import re
 from pprint import pprint
+from difflib import unified_diff
+import sys
 
 from wanakana import is_romaji, to_hiragana
 
 from utils import create_index2id_table
 from kanahyouki import generate_phonetics, WordPhonetics, PhonemeSymols, Pronunciation, SocialClass
 from pos import get_pos
+import click
 
 unicode_ranges = {
     "hiragana": "\u3041-\u3096",
@@ -64,7 +66,7 @@ class Oki2YamatoConverter():
         "o~": "õ",
     }
     example_sentences_pattern = re.compile(
-        r"((?![（）])[-～a-zCSZNQ?\s',=\]（）]{2,}\.)")
+        r"((?![（）,])[-～a-zCSZNQ?\s',=\]（）]{2,}\.)")
 
     # example_sentences_pattern = re.compile(
     #     r"(?!）)(?<!（)([-～a-zCSZNQ?\s',=\]（）]{2,}\.(?=!.*）))")
@@ -303,19 +305,6 @@ class Yamato2OkiConverter():
         return [e for sublist in nested_list for e in sublist]
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('dict_type',
-                        choices=['o2y', 'y2o'],
-                        help="""
-        o2y:沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\n
-        y2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)""")
-    return parser.parse_args()
-
-
-converter_dict = {"o2y": Oki2YamatoConverter, "y2o": Yamato2OkiConverter}
-
-
 def load_n_convert(converter):
     entry_list = []
     with open(converter.source, 'r') as base_file:
@@ -328,9 +317,63 @@ def load_n_convert(converter):
     return entry_list
 
 
-def main():
-    args = parse_args()
-    converter = converter_dict[args.dict_type]
+converter_dict = {"o2y": Oki2YamatoConverter, "y2o": Yamato2OkiConverter}
+
+
+@click.group()
+def cli():
+    """
+    DICT_TYPE は以下の種類がある。\n
+        o2y: 沖日辞典(resources/base_lists/okinawa_01.tsv からjsonへ変換)。\n
+        y2o: 日沖辞典(resources/base_lists/okinawa_02.tsv からjsonへ変換)
+    """
+    pass
+
+
+@click.command()
+@click.argument(
+    'dict_type',
+    type=click.Choice(['o2y', 'y2o'], case_sensitive=False),
+)
+def diff(dict_type):
+    converter = converter_dict[dict_type]
+
+    target_dir = Path(__file__).parent / "okinawago_dictionary"
+    json_path = target_dir / Path(converter.source).name.replace(
+        ".tsv", ".json")
+
+    entry_list = load_n_convert(converter)
+    with open(json_path, 'r') as old_file:
+        old_json = json.load(old_file)
+        old_json_s = json.dumps(
+            old_json,
+            ensure_ascii=False,
+            indent=4,
+        )
+        new_json_s = json.dumps(
+            entry_list,
+            ensure_ascii=False,
+            indent=4,
+        )
+        sys.stdout.writelines(
+            unified_diff(
+                old_json_s.splitlines(keepends=True),
+                new_json_s.splitlines(keepends=True),
+            ))
+
+
+cli.add_command(diff)
+
+
+@click.command()
+@click.argument(
+    'dict_type',
+    type=click.Choice(['o2y', 'y2o'], case_sensitive=False),
+)
+@click.confirmation_option(
+    prompt='Are you sure you want to write out the diffs?')
+def write(dict_type):
+    converter = converter_dict[dict_type]
 
     target_dir = Path(__file__).parent / "okinawago_dictionary"
     new_path = target_dir / Path(converter.source).name.replace(
@@ -354,5 +397,7 @@ def main():
                   indent=4)
 
 
-if __name__ == "__main__":
-    main()
+cli.add_command(write)
+
+if __name__ == '__main__':
+    cli()
